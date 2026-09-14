@@ -29,6 +29,11 @@
           <option value="en">English</option>
           <option value="zh-TW">繁體中文</option>
         </select>
+        <label for="piece-theme-select" class="settings-label settings-label-spaced" data-i18n="pieceTheme">PIECE THEME</label>
+        <select id="piece-theme-select" onchange="setPieceTheme(this.value)">
+          <option value="classic" data-i18n="classicPieces">CLASSIC</option>
+          <option value="modern" data-i18n="modernPieces">MODERN</option>
+        </select>
         <p class="settings-note" data-i18n="settingsNote">More settings will appear here in future updates.</p>
       </div>
     </div>

@@ -111,6 +111,10 @@ body {
   letter-spacing: 0.14em;
 }
 
+.settings-label-spaced {
+  margin-top: 18px;
+}
+
 #language-select {
   width: 100%;
   padding: 11px 10px;
@@ -287,6 +291,13 @@ body {
   user-select: none;
 
   transform: translateY(-1px);
+}
+
+.piece-image {
+  width: min(82%, 62px);
+  aspect-ratio: 1;
+  background-repeat: no-repeat;
+  background-size: 600% 200%;
 }
 
 /* ======================================================

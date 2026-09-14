@@ -76,10 +76,14 @@ const TRANSLATIONS = {
     promotionInstructions: "請選擇棋子後按確認。",
     cancel: "取消",
     confirmPromotion: "確認升變",
+    pieceTheme: "棋子主題",
+    classicPieces: "經典",
+    modernPieces: "現代",
   },
 };
 
 let currentLanguage = localStorage.getItem("chess-language") || "en";
+let currentPieceTheme = localStorage.getItem("chess-piece-theme") || "classic";
 
 function t(key, fallback = key) {
   return TRANSLATIONS[currentLanguage]?.[key] || fallback;
@@ -101,6 +105,13 @@ function setLanguage(language) {
   applyLanguage();
 }
 
+function setPieceTheme(theme) {
+  if (!["classic", "modern"].includes(theme)) return;
+  currentPieceTheme = theme;
+  localStorage.setItem("chess-piece-theme", currentPieceTheme);
+  createBoard();
+}
+
 function applyLanguage() {
   document.documentElement.lang = currentLanguage;
   document.querySelectorAll("[data-i18n]").forEach((element) => {
@@ -111,6 +122,9 @@ function applyLanguage() {
 
   const languageSelect = document.getElementById("language-select");
   if (languageSelect) languageSelect.value = currentLanguage;
+
+  const pieceThemeSelect = document.getElementById("piece-theme-select");
+  if (pieceThemeSelect) pieceThemeSelect.value = currentPieceTheme;
 
   updateTurnDisplay();
   updateMaterialScoreDisplay();
@@ -865,6 +879,32 @@ function finalizeMoveNotation(notation, colorWhoMoved) {
 // CREATE BOARD
 // ======================================================
 
+const PIECE_SPRITE_POSITIONS = {
+  "♔": { row: 0, col: 0 },
+  "♕": { row: 0, col: 1 },
+  "♖": { row: 0, col: 2 },
+  "♗": { row: 0, col: 3 },
+  "♘": { row: 0, col: 4 },
+  "♙": { row: 0, col: 5 },
+  "♚": { row: 1, col: 0 },
+  "♛": { row: 1, col: 1 },
+  "♜": { row: 1, col: 2 },
+  "♝": { row: 1, col: 3 },
+  "♞": { row: 1, col: 4 },
+  "♟": { row: 1, col: 5 },
+};
+
+function createPieceImage(piece) {
+  const position = PIECE_SPRITE_POSITIONS[piece];
+  const pieceElement = document.createElement("span");
+  pieceElement.classList.add("piece", "piece-image");
+  pieceElement.style.backgroundImage = `url("assets/pieces/${currentPieceTheme}.svg")`;
+  pieceElement.style.backgroundPosition = `${position.col * 20}% ${position.row * 100}%`;
+  pieceElement.setAttribute("role", "img");
+  pieceElement.setAttribute("aria-label", piece);
+  return pieceElement;
+}
+
 function createBoard() {
   board.innerHTML = "";
 
@@ -909,11 +949,7 @@ function createBoard() {
       const piece = pieces[logicalRow][logicalCol];
 
       if (piece !== "") {
-        const pieceElement = document.createElement("span");
-
-        pieceElement.classList.add("piece");
-
-        pieceElement.textContent = piece;
+        const pieceElement = createPieceImage(piece);
 
         pieceElement.style.position = "relative";
 

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200">
+  <g font-family="DejaVu Sans, Arial Unicode MS, sans-serif" font-size="112" font-weight="700" text-anchor="middle" dominant-baseline="middle" stroke-linejoin="round" paint-order="stroke fill">
+    <g fill="#d8ecf1" stroke="#234452" stroke-width="5">
+      <text x="50" y="50">♔</text><text x="150" y="50">♕</text><text x="250" y="50">♖</text><text x="350" y="50">♗</text><text x="450" y="50">♘</text><text x="550" y="50">♙</text>
+    </g>
+    <g fill="#182d39" stroke="#84b6c4" stroke-width="2">
+      <text x="50" y="150">♚</text><text x="150" y="150">♛</text><text x="250" y="150">♜</text><text x="350" y="150">♝</text><text x="450" y="150">♞</text><text x="550" y="150">♟</text>
+    </g>
+  </g>
+</svg>
