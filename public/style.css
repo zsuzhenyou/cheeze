@@ -128,6 +128,72 @@ body {
   line-height: 1.6;
 }
 
+.promotion-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.74);
+}
+
+.promotion-card {
+  width: min(100%, 420px);
+  padding: 26px;
+  border: 1px solid rgba(240, 217, 181, 0.45);
+  border-radius: 6px;
+  background: #191919;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+.promotion-card h2 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+}
+
+.promotion-card p {
+  margin: 10px 0 22px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+}
+
+.promotion-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.promotion-option {
+  min-height: 76px;
+  padding: 8px;
+  font-size: 44px;
+  line-height: 1;
+}
+
+.promotion-option.selected,
+.promotion-option.selected:hover {
+  border-color: #f0d9b5;
+  background: #f0d9b5;
+  color: #181818;
+}
+
+.promotion-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.promotion-confirm,
+.promotion-confirm:hover {
+  border-color: #f0d9b5;
+  background: #f0d9b5;
+  color: #181818;
+}
+
 /* ======================================================
    MAIN GAME
 ====================================================== */

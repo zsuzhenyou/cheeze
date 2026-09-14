@@ -374,6 +374,7 @@ let isAnimating = false;
 let moveHistory = [];
 
 let pendingPromotionNotation = null;
+let pendingPromotionSelection = null;
 
 // ======================================================
 // MATERIAL SCORE
@@ -1152,6 +1153,23 @@ function makeMove(
   if (isAnimating) {
     return;
   }
+
+  const movingPiece = pieces[fromRow][fromCol];
+  const isPromotionMove =
+    (movingPiece === "♙" && toRow === 0) ||
+    (movingPiece === "♟" && toRow === 7);
+
+  // 人類升變先以視覺選單確認；確認後才真正執行這一步。
+  if (isPromotionMove && !isRemoteMove && !moveData.promotion) {
+    if (AI_ENABLED && currentTurn === AI_COLOR) {
+      moveData = { ...moveData, promotion: "queen" };
+    } else {
+      openPromotionDialog(movingPiece === "♙" ? "white" : "black", (promotion) => {
+        makeMove(fromRow, fromCol, toRow, toCol, { ...moveData, promotion });
+      });
+      return;
+    }
+  }
   // ======================================================
   // ONLINE MODE
   // ======================================================
@@ -1170,17 +1188,7 @@ function makeMove(
 
     let promotion = null;
 
-    const movingPiece = pieces[fromRow][fromCol];
-
-    const isPromotion =
-      (movingPiece === "♙" && toRow === 0) ||
-      (movingPiece === "♟" && toRow === 7);
-
-    if (isPromotion) {
-      const promotionColor = movingPiece === "♙" ? "white" : "black";
-
-      promotion = choosePromotionPiece(promotionColor);
-    }
+    promotion = moveData.promotion || null;
 
     submitOnlineMove(fromSquare, toSquare, promotion);
 
@@ -1201,8 +1209,6 @@ function makeMove(
     createBoard();
     return;
   }
-  const movingPiece = pieces[fromRow][fromCol];
-
   const capturedPiece = pieces[toRow][toCol];
 
   const isCapture = capturedPiece !== "" || moveData.enPassant === true;
@@ -1283,13 +1289,8 @@ function makeMove(
   if (isWhitePromotion || isBlackPromotion) {
     const promotionColor = isWhitePromotion ? "white" : "black";
 
-    if (isRemoteMove) {
-      // 遠端棋步必須使用對手傳來的升變結果
-      selectedPromotion = moveData.promotion || "queen";
-    } else {
-      // 本地玩家先選擇升變棋子
-      selectedPromotion = choosePromotionPiece(promotionColor);
-    }
+    // 已在移動前由視覺選單（或遠端資料）決定升變種類。
+    selectedPromotion = moveData.promotion || "queen";
 
     moveData = {
       ...moveData,
@@ -1307,7 +1308,12 @@ function makeMove(
     if (isWhitePromotion || isBlackPromotion) {
       pendingPromotionNotation = moveNotation;
 
-      promotePawn(toRow, toCol, isWhitePromotion ? "white" : "black");
+      promotePawn(
+        toRow,
+        toCol,
+        isWhitePromotion ? "white" : "black",
+        selectedPromotion,
+      );
 
       return;
     }
@@ -2704,26 +2710,62 @@ function resetGame() {
 // ======================================================
 // PAWN PROMOTION
 // ======================================================
-function choosePromotionPiece(color) {
-  const choice = prompt(
-    "請選擇升變棋子：\n\n" + "1 = 后\n" + "2 = 車\n" + "3 = 象\n" + "4 = 馬",
-    "1",
-  );
+const PROMOTION_CHOICES = ["queen", "rook", "bishop", "knight"];
 
-  switch (choice) {
-    case "2":
-      return color === "white" ? "rook" : "rook";
+function openPromotionDialog(color, onConfirm) {
+  const modal = document.getElementById("promotion-modal");
+  const options = document.getElementById("promotion-options");
+  if (!modal || !options) return;
 
-    case "3":
-      return color === "white" ? "bishop" : "bishop";
+  pendingPromotionSelection = { color, onConfirm, promotion: "queen" };
+  options.innerHTML = "";
 
-    case "4":
-      return color === "white" ? "knight" : "knight";
+  PROMOTION_CHOICES.forEach((promotion) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "promotion-option";
+    button.dataset.promotion = promotion;
+    button.setAttribute("role", "radio");
+    button.setAttribute("aria-checked", String(promotion === "queen"));
+    button.textContent = promotionCodeToPiece(color, promotion);
+    button.onclick = () => selectPromotion(promotion);
+    options.appendChild(button);
+  });
 
-    case "1":
-    default:
-      return "queen";
-  }
+  updatePromotionSelectionUI();
+  modal.classList.remove("hidden");
+}
+
+function selectPromotion(promotion) {
+  if (!pendingPromotionSelection || !PROMOTION_CHOICES.includes(promotion)) return;
+  pendingPromotionSelection.promotion = promotion;
+  updatePromotionSelectionUI();
+}
+
+function updatePromotionSelectionUI() {
+  const selected = pendingPromotionSelection?.promotion;
+  document.querySelectorAll(".promotion-option").forEach((button) => {
+    const isSelected = button.dataset.promotion === selected;
+    button.classList.toggle("selected", isSelected);
+    button.setAttribute("aria-checked", String(isSelected));
+  });
+}
+
+function confirmPromotion() {
+  if (!pendingPromotionSelection) return;
+  const { promotion, onConfirm } = pendingPromotionSelection;
+  closePromotionDialog();
+  onConfirm(promotion);
+}
+
+function cancelPromotion() {
+  closePromotionDialog();
+}
+
+function closePromotionDialog() {
+  const modal = document.getElementById("promotion-modal");
+  if (modal) modal.classList.add("hidden");
+  pendingPromotionSelection = null;
 }
 
 function promotionCodeToPiece(color, promotion) {
@@ -2744,37 +2786,8 @@ function promotionCodeToPiece(color, promotion) {
   return color === "white" ? "♕" : "♛";
 }
 
-function promotePawn(row, col, color) {
-  const choices =
-    color === "white" ? ["♕", "♖", "♗", "♘"] : ["♛", "♜", "♝", "♞"];
-
-  const choice = prompt(
-    "請選擇升變棋子：\n\n" + "1 = 后\n" + "2 = 車\n" + "3 = 象\n" + "4 = 馬",
-  );
-
-  let promotedPiece;
-
-  switch (choice) {
-    case "1":
-      promotedPiece = choices[0];
-      break;
-
-    case "2":
-      promotedPiece = choices[1];
-      break;
-
-    case "3":
-      promotedPiece = choices[2];
-      break;
-
-    case "4":
-      promotedPiece = choices[3];
-      break;
-
-    default:
-      promotedPiece = choices[0];
-      break;
-  }
+function promotePawn(row, col, color, promotion = "queen") {
+  const promotedPiece = promotionCodeToPiece(color, promotion);
 
   pieces[row][col] = promotedPiece;
 
