@@ -1,0 +1,19 @@
+{
+  "name": "chess-online",
+  "version": "1.0.0",
+  "description": "Two-player online chess with shareable rooms.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "chess.js": "^1.4.0",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  }
+}

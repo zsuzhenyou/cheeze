@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Chess</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div>
+        <h1>CHESS</h1>
+        <p>made by Chris Su</p>
+      </div>
+    </header>
+
+    <main id="main-menu">
+      <section class="menu-card">
+        <h2>CHESS</h2>
+
+        <p class="menu-subtitle">CHOOSE A GAME MODE</p>
+
+        <div class="menu-actions">
+          <button type="button" class="menu-button" onclick="startNormalMode()">
+            NORMAL MODE
+          </button>
+
+          <button type="button" class="menu-button" onclick="startOnlineMode()">
+            ONLINE MODE
+          </button>
+
+          <button
+            type="button"
+            class="menu-button"
+            onclick="startTrainingMode()"
+          >
+            TRAINING MODE
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <main id="game" class="hidden">
+      <section id="board-area">
+        <div id="chessboard"></div>
+      </section>
+
+      <aside id="side-panel">
+        <!-- 一般模式：與 online-panel 同層 -->
+        <div id="normal-panel">
+          <section class="panel status-panel">
+            <div class="panel-header">
+              <span>GAME STATUS</span>
+            </div>
+
+            <div id="turn">White's Turn</div>
+            <div id="material-score"></div>
+          </section>
+
+          <section class="panel player-panel">
+            <div class="panel-header">
+              <span>PLAY AS</span>
+            </div>
+
+            <div id="controls">
+              <button
+                type="button"
+                data-color="white"
+                onclick="setPlayerColor('white')"
+              >
+                WHITE
+              </button>
+
+              <button
+                type="button"
+                data-color="black"
+                onclick="setPlayerColor('black')"
+              >
+                BLACK
+              </button>
+            </div>
+          </section>
+
+          <section class="panel action-panel">
+            <div class="panel-header">
+              <span>GAME</span>
+            </div>
+
+            <div id="game-actions">
+              <button type="button" onclick="resetGame()">RESTART</button>
+
+              <button type="button" onclick="flipBoard()">FLIP BOARD</button>
+
+              <button type="button" onclick="openOnlineMode()">
+                ONLINE MODE
+              </button>
+
+              <button type="button" onclick="openTrainingMode()">
+                TRAINING MODE
+              </button>
+
+              <button type="button" onclick="showMainMenu()">MAIN MENU</button>
+            </div>
+          </section>
+        </div>
+
+        <!-- 線上模式：與 normal-panel 同層，不可放入 normal-panel 裡 -->
+        <section id="online-panel" class="panel online-panel hidden">
+          <div class="panel-header">
+            <span>ONLINE MODE</span>
+          </div>
+
+          <div id="online-menu" class="online-menu">
+            <button
+              type="button"
+              id="create-room-menu-btn"
+              onclick="showCreateRoom()"
+            >
+              CREATE ROOM
+            </button>
+
+            <button
+              type="button"
+              id="join-room-menu-btn"
+              onclick="showJoinRoom()"
+            >
+              JOIN ROOM
+            </button>
+
+            <button type="button" onclick="closeOnlineMode()">BACK</button>
+          </div>
+
+          <div id="create-room-panel" class="online-sub-panel hidden">
+            <div class="online-label">CREATE ROOM</div>
+
+            <p class="online-description">建立房間後，將房間 ID 分享給對手。</p>
+
+            <button
+              id="create-room-btn"
+              type="button"
+              onclick="createOnlineRoom()"
+            >
+              CREATE ROOM
+            </button>
+
+            <button type="button" onclick="showOnlineMenu()">BACK</button>
+          </div>
+
+          <div id="join-room-panel" class="online-sub-panel hidden">
+            <div class="online-label">JOIN ROOM</div>
+
+            <div class="join-room-group">
+              <input
+                id="room-id"
+                type="text"
+                placeholder="ENTER ROOM ID"
+                maxlength="12"
+                autocomplete="off"
+              />
+
+              <button
+                id="join-room-btn"
+                type="button"
+                onclick="joinOnlineRoom()"
+              >
+                JOIN ROOM
+              </button>
+            </div>
+
+            <button type="button" onclick="showOnlineMenu()">BACK</button>
+          </div>
+
+          <div id="online-room-panel" class="online-room-panel hidden">
+            <div id="online-room-info">
+              <span>ROOM:</span>
+              <strong id="current-room-id">—</strong>
+            </div>
+
+            <div id="online-player-info">
+              <span>COLOR:</span>
+              <strong id="current-player-color">—</strong>
+            </div>
+
+            <div id="online-status" role="status">尚未連線</div>
+
+            <button type="button" onclick="leaveOnlineRoom()">
+              LEAVE ROOM
+            </button>
+          </div>
+        </section>
+
+        <!-- 訓練模式：與前兩個面板同層 -->
+        <div id="training-panel" class="hidden">
+          <div class="training-layout">
+            <div class="training-info-column">
+              <section class="panel status-panel">
+                <div class="panel-header">
+                  <span>GAME STATUS</span>
+                </div>
+
+                <div id="training-turn">White's Turn</div>
+                <div id="training-material-score"></div>
+              </section>
+
+              <section class="panel record-panel">
+                <div class="panel-header">
+                  <span>GAME RECORD</span>
+                </div>
+
+                <div id="training-move-history"></div>
+              </section>
+
+              <section class="panel action-panel">
+                <div class="panel-header">
+                  <span>GAME</span>
+                </div>
+
+                <div id="training-game-actions">
+                  <button type="button" onclick="resetTrainingGame()">
+                    RESET
+                  </button>
+
+                  <button type="button" onclick="flipBoard()">
+                    FLIP BOARD
+                  </button>
+
+                  <button type="button" onclick="closeTrainingMode()">
+                    BACK
+                  </button>
+
+                  <button type="button" onclick="showMainMenu()">
+                    MAIN MENU
+                  </button>
+                </div>
+              </section>
+            </div>
+
+            <section class="panel training-main-panel">
+              <div class="panel-header">
+                <span>TRAINING MODE</span>
+              </div>
+
+              <div class="training-section">
+                <div class="training-label">PIECES</div>
+
+                <div class="piece-group">
+                  <div class="piece-group-label">WHITE</div>
+
+                  <div class="piece-palette">
+                    <button type="button" onclick="selectSetupPiece('♔')">
+                      ♔
+                    </button>
+                    <button type="button" onclick="selectSetupPiece('♕')">
+                      ♕
+                    </button>
+                    <button type="button" onclick="selectSetupPiece('♖')">
+                      ♖
+                    </button>
+                    <button type="button" onclick="selectSetupPiece('♗')">
+                      ♗
+                    </button>
+                    <button type="button" onclick="selectSetupPiece('♘')">
+                      ♘
+                    </button>
+                    <button type="button" onclick="selectSetupPiece('♙')">
+                      ♙
+                    </button>
+                  </div>
+                </div>
+
+                <div class="piece-group">
+                  <div class="piece-group-label">BLACK</div>
+
+                  <div class="piece-palette">
+                    <button type="button" onclick="selectSetupPiece('♚')">
+                      ♚
+                    </button>
+                    <button type="button" onclick="selectSetupPiece('♛')">
+                      ♛
+                    </button>
+                    <button type="button" onclick="selectSetupPiece('♜')">
+                      ♜
+                    </button>
+                    <button type="button" onclick="selectSetupPiece('♝')">
+                      ♝
+                    </button>
+                    <button type="button" onclick="selectSetupPiece('♞')">
+                      ♞
+                    </button>
+                    <button type="button" onclick="selectSetupPiece('♟')">
+                      ♟
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="training-section">
+                <div class="training-label">TOOLS</div>
+
+                <div class="training-tools">
+                  <button type="button" onclick="selectSetupPiece('erase')">
+                    ERASE
+                  </button>
+
+                  <button type="button" onclick="clearSetupBoard()">
+                    CLEAR
+                  </button>
+
+                  <button type="button" onclick="restoreSetupBoard()">
+                    RESTORE
+                  </button>
+                </div>
+              </div>
+
+              <div class="training-section">
+                <div class="training-label">WHO STARTS?</div>
+
+                <div class="training-switch">
+                  <label class="training-option">
+                    <input
+                      type="radio"
+                      name="training-start"
+                      value="white"
+                      checked
+                    />
+                    <span>WHITE</span>
+                  </label>
+
+                  <label class="training-option">
+                    <input type="radio" name="training-start" value="black" />
+                    <span>BLACK</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="training-section">
+                <div class="training-label">PLAY MODE</div>
+
+                <div class="training-switch">
+                  <label class="training-option">
+                    <input
+                      type="radio"
+                      name="training-play-mode"
+                      value="ai"
+                      checked
+                      onchange="updateTrainingModeUI()"
+                    />
+                    <span>HUMAN VS AI</span>
+                  </label>
+
+                  <label class="training-option">
+                    <input
+                      type="radio"
+                      name="training-play-mode"
+                      value="human"
+                      onchange="updateTrainingModeUI()"
+                    />
+                    <span>HUMAN VS HUMAN</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="training-section" id="training-player-section">
+                <div class="training-label">YOU PLAY AS</div>
+
+                <div class="training-switch">
+                  <label class="training-option">
+                    <input
+                      type="radio"
+                      name="training-player"
+                      value="white"
+                      checked
+                    />
+                    <span>WHITE</span>
+                  </label>
+
+                  <label class="training-option">
+                    <input type="radio" name="training-player" value="black" />
+                    <span>BLACK</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="training-actions">
+                <button
+                  type="button"
+                  class="training-start-button"
+                  onclick="startTrainingGame()"
+                >
+                  START TRAINING
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>CHESS GAME · VISUAL COMMUNICATION</footer>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

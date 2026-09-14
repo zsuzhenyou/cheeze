@@ -1,0 +1,1314 @@
+/* ======================================================
+   RESET
+====================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+
+  background: #111111;
+  color: #ffffff;
+
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ======================================================
+   HEADER
+====================================================== */
+
+.site-header {
+  width: 100%;
+
+  padding: 32px 40px 24px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.site-header h1 {
+  margin: 0;
+
+  font-size: 32px;
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+}
+
+.site-header p {
+  margin: 6px 0 0;
+
+  font-size: 11px;
+
+  letter-spacing: 0.2em;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ======================================================
+   MAIN GAME
+====================================================== */
+
+#game {
+  width: min(1080px, calc(100% - 48px));
+
+  margin: 40px auto;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 640px)
+    300px;
+
+  gap: 32px;
+
+  align-items: start;
+}
+
+/* ======================================================
+   BOARD AREA
+====================================================== */
+
+#board-area {
+  width: 100%;
+}
+
+/* ======================================================
+   CHESS BOARD
+====================================================== */
+
+#chessboard {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+
+  display: grid;
+
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* ======================================================
+   SQUARE
+====================================================== */
+
+.square {
+  position: relative;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  user-select: none;
+
+  cursor: pointer;
+
+  overflow: hidden;
+}
+
+.square.light {
+  background: #f0d9b5;
+}
+
+.square.dark {
+  background: #b58863;
+}
+
+/* ======================================================
+   PIECES
+====================================================== */
+
+.piece {
+  position: relative;
+
+  z-index: 2;
+
+  font-size: clamp(32px, 6vw, 58px);
+
+  line-height: 1;
+
+  pointer-events: none;
+
+  user-select: none;
+
+  transform: translateY(-1px);
+}
+
+/* ======================================================
+   COORDINATES
+====================================================== */
+
+.file-label,
+.rank-label {
+  position: absolute;
+
+  z-index: 3;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  line-height: 1;
+
+  pointer-events: none;
+
+  opacity: 0.7;
+}
+
+.file-label {
+  bottom: 4px;
+  right: 5px;
+}
+
+.rank-label {
+  top: 4px;
+  left: 5px;
+}
+
+.square.light .file-label,
+.square.light .rank-label {
+  color: #b58863;
+}
+
+.square.dark .file-label,
+.square.dark .rank-label {
+  color: #f0d9b5;
+}
+
+/* ======================================================
+   LAST MOVE
+====================================================== */
+
+.square.last-move {
+  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.28);
+}
+
+/* ======================================================
+   SELECTED SQUARE
+====================================================== */
+
+.square.selected {
+  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.75);
+}
+
+/* ======================================================
+   LEGAL MOVE
+====================================================== */
+
+.square.legal-move::after {
+  content: "";
+
+  position: absolute;
+
+  width: 20%;
+  aspect-ratio: 1 / 1;
+
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.28);
+
+  z-index: 1;
+
+  pointer-events: none;
+}
+
+.square.legal-move:hover::after {
+  width: 28%;
+}
+
+/* ======================================================
+   SIDE PANEL
+====================================================== */
+
+#side-panel {
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 14px;
+}
+
+/* ======================================================
+   PANEL
+====================================================== */
+
+.panel {
+  width: 100%;
+
+  padding: 18px;
+
+  background: #191919;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 4px;
+}
+
+/* ======================================================
+   PANEL HEADER
+====================================================== */
+
+.panel-header {
+  margin-bottom: 14px;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.16em;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ======================================================
+   TURN DISPLAY
+====================================================== */
+
+#turn {
+  min-height: 30px;
+
+  display: flex;
+
+  align-items: center;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.02em;
+
+  color: #ffffff;
+}
+
+/* ======================================================
+   MATERIAL SCORE
+====================================================== */
+
+#material-score {
+  margin-top: 8px;
+
+  font-size: 11px;
+
+  letter-spacing: 0.12em;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ======================================================
+   PLAYER CONTROLS
+====================================================== */
+
+#controls {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 8px;
+}
+
+/* ======================================================
+   BUTTON
+====================================================== */
+
+button {
+  appearance: none;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  background: #222222;
+
+  color: rgba(255, 255, 255, 0.75);
+
+  padding: 12px 10px;
+
+  font-family: inherit;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.12em;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+button:hover {
+  background: #2d2d2d;
+
+  color: #ffffff;
+
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+/* ======================================================
+   ACTIVE PLAYER BUTTON
+====================================================== */
+
+#controls button.active {
+  background: #f0d9b5;
+
+  color: #181818;
+
+  border-color: #f0d9b5;
+}
+
+#controls button.active:hover {
+  background: #f0d9b5;
+
+  color: #181818;
+}
+
+/* ======================================================
+   MOVE HISTORY
+====================================================== */
+
+.record-panel {
+  min-height: 220px;
+}
+
+#move-history {
+  width: 100%;
+
+  max-height: 360px;
+
+  overflow-y: auto;
+
+  scrollbar-width: thin;
+}
+
+#move-history-table {
+  width: 100%;
+}
+
+/* ======================================================
+   MOVE HISTORY HEADER / ROW
+====================================================== */
+
+.move-history-header,
+.move-history-row {
+  display: grid;
+
+  grid-template-columns:
+    42px
+    1fr
+    1fr;
+
+  align-items: center;
+}
+
+.move-history-header {
+  padding: 8px 10px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.12em;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.move-history-row {
+  padding: 9px 10px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+
+  font-size: 14px;
+
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.move-history-row > div:first-child {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ======================================================
+   LATEST MOVE
+====================================================== */
+
+.latest-move {
+  font-weight: 700;
+
+  color: #ffffff;
+
+  text-decoration: underline;
+
+  text-underline-offset: 3px;
+}
+
+/* ======================================================
+   EMPTY RECORD
+====================================================== */
+
+#move-history-table:empty::after {
+  content: "No moves yet";
+
+  display: block;
+
+  padding: 20px 10px;
+
+  color: rgba(255, 255, 255, 0.25);
+
+  font-size: 13px;
+}
+
+/* ======================================================
+   GAME ACTIONS
+====================================================== */
+
+#game-actions {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 8px;
+}
+
+#game-actions button:last-child {
+  grid-column: 1 / -1;
+}
+
+/* ======================================================
+   TRAINING MODE
+====================================================== */
+
+#training-panel {
+  width: 100%;
+}
+
+/* ======================================================
+   TRAINING MAIN PANEL
+====================================================== */
+
+.training-main-panel {
+  width: 100%;
+}
+
+/* ======================================================
+   TRAINING SECTION
+====================================================== */
+
+.training-section {
+  margin-bottom: 18px;
+
+  padding-bottom: 16px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.training-section:last-of-type {
+  margin-bottom: 0;
+
+  padding-bottom: 0;
+
+  border-bottom: none;
+}
+
+/* ======================================================
+   TRAINING LABEL
+====================================================== */
+
+.training-label {
+  margin-bottom: 9px;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.16em;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ======================================================
+   PIECE GROUP
+====================================================== */
+
+.piece-group {
+  margin-bottom: 10px;
+}
+
+.piece-group:last-child {
+  margin-bottom: 0;
+}
+
+.piece-group-label {
+  margin-bottom: 6px;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.12em;
+
+  color: rgba(255, 255, 255, 0.28);
+}
+
+/* ======================================================
+   PIECE PALETTE
+====================================================== */
+
+.piece-palette {
+  display: grid;
+
+  grid-template-columns: repeat(6, 1fr);
+
+  gap: 5px;
+}
+
+.piece-palette button {
+  width: 100%;
+  height: 38px;
+
+  padding: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-family: "Times New Roman", serif;
+
+  font-size: 25px;
+
+  line-height: 1;
+
+  letter-spacing: 0;
+
+  color: #ffffff;
+
+  background: #222222;
+}
+
+.piece-palette button:hover {
+  background: #2d2d2d;
+}
+
+/* ======================================================
+   TRAINING TOOLS
+====================================================== */
+
+.training-tools {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 8px;
+}
+
+.training-tools button {
+  padding: 11px 6px;
+
+  font-size: 10px;
+}
+
+/* ======================================================
+   TRAINING SWITCH
+====================================================== */
+
+.training-switch {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 8px;
+}
+
+/* ======================================================
+   TRAINING OPTION
+====================================================== */
+
+.training-option {
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 38px;
+
+  padding: 8px 6px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  background: #222222;
+
+  color: rgba(255, 255, 255, 0.65);
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.training-option:hover {
+  background: #2d2d2d;
+
+  color: #ffffff;
+
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.training-option input {
+  position: absolute;
+
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+.training-option:has(input:checked) {
+  background: #f0d9b5;
+
+  color: #181818;
+
+  border-color: #f0d9b5;
+}
+
+/* ======================================================
+   TRAINING ACTIONS
+====================================================== */
+
+.training-actions {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 8px;
+
+  margin-top: 18px;
+}
+
+.training-actions button {
+  padding: 12px 8px;
+
+  font-size: 10px;
+}
+
+/* ======================================================
+   TRAINING START BUTTON
+====================================================== */
+
+.training-start-button {
+  background: #f0d9b5;
+
+  color: #181818;
+
+  border-color: #f0d9b5;
+}
+
+.training-start-button:hover {
+  background: #f0d9b5;
+
+  color: #181818;
+
+  border-color: #f0d9b5;
+}
+
+/* ======================================================
+   FOOTER
+====================================================== */
+
+footer {
+  width: 100%;
+
+  padding: 20px 40px 30px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+  text-align: center;
+
+  font-size: 9px;
+
+  letter-spacing: 0.18em;
+
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* ======================================================
+   HIDDEN
+====================================================== */
+
+.hidden {
+  display: none !important;
+}
+
+/* ======================================================
+   MOBILE
+====================================================== */
+
+@media (max-width: 800px) {
+  .site-header {
+    padding: 24px 20px 18px;
+  }
+
+  .site-header h1 {
+    font-size: 26px;
+  }
+
+  #game {
+    width: calc(100% - 28px);
+
+    margin: 24px auto;
+
+    grid-template-columns: 1fr;
+
+    gap: 20px;
+  }
+
+  #side-panel {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+  }
+
+  .status-panel,
+  .record-panel,
+  #training-panel {
+    grid-column: 1 / -1;
+  }
+
+  .panel {
+    padding: 15px;
+  }
+
+  footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* ======================================================
+   SMALL MOBILE
+====================================================== */
+
+@media (max-width: 480px) {
+  #game {
+    width: calc(100% - 18px);
+
+    margin-top: 16px;
+  }
+
+  .piece {
+    font-size: 11vw;
+  }
+
+  .file-label,
+  .rank-label {
+    font-size: 8px;
+  }
+
+  #side-panel {
+    display: flex;
+  }
+
+  #game-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .piece-palette button {
+    height: 36px;
+
+    font-size: 23px;
+  }
+
+  .training-option {
+    font-size: 9px;
+
+    letter-spacing: 0.05em;
+  }
+}
+/* =========================
+   TRAINING MODE TWO-COLUMN LAYOUT
+========================== */
+
+#training-panel {
+  width: 100%;
+}
+
+.training-layout {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.85fr) minmax(260px, 1.15fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.training-info-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.training-main-panel {
+  min-width: 0;
+}
+
+#training-game-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+#training-game-actions button:last-child {
+  grid-column: 1 / -1;
+}
+
+.training-actions {
+  margin-top: 16px;
+}
+
+.training-actions button {
+  width: 100%;
+}
+
+/* 小螢幕時改回單欄，避免內容太窄 */
+
+@media (max-width: 700px) {
+  .training-layout {
+    grid-template-columns: 1fr;
+  }
+
+  #training-game-actions {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  #training-game-actions button:last-child {
+    grid-column: auto;
+  }
+}
+.hidden {
+  display: none !important;
+}
+
+#main-menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #111827;
+}
+
+.menu-card {
+  width: min(420px, 100%);
+  padding: 48px 32px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  background: #1f2937;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.menu-card h1 {
+  margin: 0;
+  color: #f9fafb;
+  font-size: 48px;
+  letter-spacing: 0.12em;
+}
+
+.menu-subtitle {
+  margin: 12px 0 32px;
+  color: #9ca3af;
+}
+
+.menu-button {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 15px 20px;
+  border: 0;
+  border-radius: 10px;
+  color: #ffffff;
+  background: #374151;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+
+.menu-button:hover {
+  background: #4b5563;
+  transform: translateY(-2px);
+}
+
+.menu-button:active {
+  transform: translateY(0);
+}
+/* ======================================================
+   PAGE LAYOUT
+   讓 Footer 貼齊螢幕底部
+====================================================== */
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #111111;
+  color: #ffffff;
+}
+
+/* Header 不被壓縮 */
+.site-header {
+  flex-shrink: 0;
+}
+
+/* 主選單撐滿 Header 與 Footer 之間的剩餘空間 */
+#main-menu {
+  flex: 1;
+
+  min-height: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: #111827;
+}
+
+/* 遊戲畫面也佔用剩餘空間 */
+#game {
+  flex: 1;
+
+  min-height: 0;
+}
+
+/* hidden 必須優先於 flex */
+.hidden {
+  display: none !important;
+}
+
+/* 不要讓 .screen 強制產生額外的 100vh 高度 */
+.screen {
+  min-height: 0;
+}
+
+/* Footer 自然貼齊底部，不遮住畫面內容 */
+footer {
+  flex-shrink: 0;
+
+  width: 100%;
+  margin-top: auto;
+
+  padding: 20px 40px 30px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+  text-align: center;
+
+  font-size: 9px;
+  letter-spacing: 0.18em;
+
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* ======================================================
+   MAIN MENU
+====================================================== */
+
+.menu-card {
+  width: min(420px, 100%);
+
+  padding: 48px 32px;
+
+  text-align: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+
+  background: #1f2937;
+
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.menu-card h1 {
+  margin: 0;
+
+  color: #f9fafb;
+
+  font-size: 48px;
+  letter-spacing: 0.12em;
+}
+
+.menu-subtitle {
+  margin: 12px 0 32px;
+
+  color: #9ca3af;
+}
+
+.menu-button {
+  display: block;
+
+  width: 100%;
+
+  margin-top: 14px;
+  padding: 15px 20px;
+
+  border: 0;
+  border-radius: 10px;
+
+  color: #ffffff;
+  background: #374151;
+
+  cursor: pointer;
+
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+
+.menu-button:hover {
+  background: #4b5563;
+
+  transform: translateY(-2px);
+}
+
+.menu-button:active {
+  transform: translateY(0);
+}
+
+/* ======================================================
+   TRAINING MODE TWO-COLUMN LAYOUT
+====================================================== */
+
+#training-panel {
+  width: 100%;
+}
+
+.training-layout {
+  display: grid;
+
+  grid-template-columns:
+    minmax(180px, 0.85fr)
+    minmax(260px, 1.15fr);
+
+  gap: 16px;
+
+  align-items: start;
+}
+
+.training-info-column {
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
+
+  min-width: 0;
+}
+
+.training-main-panel {
+  min-width: 0;
+}
+
+#training-game-actions {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 8px;
+}
+
+#training-game-actions button:last-child {
+  grid-column: 1 / -1;
+}
+
+.training-actions {
+  margin-top: 16px;
+}
+
+.training-actions button {
+  width: 100%;
+}
+
+/* ======================================================
+   RESPONSIVE
+====================================================== */
+
+@media (max-width: 800px) {
+  #game {
+    flex: none;
+  }
+
+  footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 700px) {
+  .training-layout {
+    grid-template-columns: 1fr;
+  }
+
+  #training-game-actions {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  #training-game-actions button:last-child {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  #main-menu {
+    padding: 18px;
+  }
+
+  .menu-card {
+    padding: 36px 22px;
+  }
+
+  .menu-card h1 {
+    font-size: 38px;
+  }
+
+  footer {
+    padding: 16px 20px 24px;
+  }
+}
+.online-menu,
+.online-sub-panel,
+.online-room-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.online-description {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.online-label {
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+.join-room-group {
+  display: grid;
+  gap: 8px;
+}
+
+#room-id {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 11px 10px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
+  background: #222;
+  color: #fff;
+
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  outline: none;
+}
+
+#room-id:focus {
+  border-color: #f0d9b5;
+}
+
+#room-id::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+#online-room-info,
+#online-player-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 10px 0;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#online-room-info span,
+#online-player-info span {
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+#online-room-info strong,
+#online-player-info strong {
+  color: #f0d9b5;
+
+  font-size: 13px;
+  letter-spacing: 0.1em;
+}
+
+#online-status {
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  color: rgba(255, 255, 255, 0.75);
+
+  font-size: 12px;
+  line-height: 1.5;
+}
