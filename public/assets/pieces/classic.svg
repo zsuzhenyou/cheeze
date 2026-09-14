@@ -1,10 +1,64 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200">
-  <g font-family="DejaVu Sans, Arial Unicode MS, serif" font-size="112" text-anchor="middle" dominant-baseline="middle" stroke-linejoin="round" paint-order="stroke fill">
-    <g fill="#f7f2e5" stroke="#5e4633" stroke-width="4">
-      <text x="50" y="50">♔</text><text x="150" y="50">♕</text><text x="250" y="50">♖</text><text x="350" y="50">♗</text><text x="450" y="50">♘</text><text x="550" y="50">♙</text>
-    </g>
-    <g fill="#30231d" stroke="#d5b88d" stroke-width="2">
-      <text x="50" y="150">♚</text><text x="150" y="150">♛</text><text x="250" y="150">♜</text><text x="350" y="150">♝</text><text x="450" y="150">♞</text><text x="550" y="150">♟</text>
-    </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_圖層_1" data-name="圖層_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 600 200">
+  <!-- Generator: Adobe Illustrator 30.8.1, SVG Export Plug-In . SVG Version: 2.1.4 Build 1)  -->
+  <defs>
+    <style>
+      .st0 {
+        stroke: #d5b88d;
+        stroke-width: 2px;
+      }
+
+      .st0, .st1, .st2, .st3 {
+        font-family: ArialUnicodeMS, 'Arial Unicode MS';
+        font-size: 97.01px;
+        isolation: isolate;
+      }
+
+      .st0, .st2 {
+        fill: none;
+        stroke-linejoin: round;
+      }
+
+      .st1 {
+        fill: #f7f2e5;
+      }
+
+      .st2 {
+        stroke: #5e4633;
+        stroke-width: 4px;
+      }
+
+      .st3 {
+        fill: #30231d;
+      }
+    </style>
+  </defs>
+  <g>
+    <text class="st1" transform="translate(36.54 93.09)"><tspan x="0" y="0">♔</tspan></text>
+    <text class="st2" transform="translate(36.54 93.09)"><tspan x="0" y="0">♔</tspan></text>
+    <text class="st1" transform="translate(123.15 93.09)"><tspan x="0" y="0">♕</tspan></text>
+    <text class="st2" transform="translate(123.15 93.09)"><tspan x="0" y="0">♕</tspan></text>
+    <text class="st1" transform="translate(209.76 93.09)"><tspan x="0" y="0">♖</tspan></text>
+    <text class="st2" transform="translate(209.76 93.09)"><tspan x="0" y="0">♖</tspan></text>
+    <text class="st1" transform="translate(296.37 93.09)"><tspan x="0" y="0">♗</tspan></text>
+    <text class="st2" transform="translate(296.37 93.09)"><tspan x="0" y="0">♗</tspan></text>
+    <text class="st1" transform="translate(382.99 93.09)"><tspan x="0" y="0">♘</tspan></text>
+    <text class="st2" transform="translate(382.99 93.09)"><tspan x="0" y="0">♘</tspan></text>
+    <text class="st1" transform="translate(469.6 93.09)"><tspan x="0" y="0">♙</tspan></text>
+    <text class="st2" transform="translate(469.6 93.09)"><tspan x="0" y="0">♙</tspan></text>
+  </g>
+  <g>
+    <text class="st3" transform="translate(36.54 179.7)"><tspan x="0" y="0">♚</tspan></text>
+    <text class="st0" transform="translate(36.54 179.7)"><tspan x="0" y="0">♚</tspan></text>
+    <text class="st3" transform="translate(123.15 179.7)"><tspan x="0" y="0">♛</tspan></text>
+    <text class="st0" transform="translate(123.15 179.7)"><tspan x="0" y="0">♛</tspan></text>
+    <text class="st3" transform="translate(209.76 179.7)"><tspan x="0" y="0">♜</tspan></text>
+    <text class="st0" transform="translate(209.76 179.7)"><tspan x="0" y="0">♜</tspan></text>
+    <text class="st3" transform="translate(296.37 179.7)"><tspan x="0" y="0">♝</tspan></text>
+    <text class="st0" transform="translate(296.37 179.7)"><tspan x="0" y="0">♝</tspan></text>
+    <text class="st3" transform="translate(382.99 179.7)"><tspan x="0" y="0">♞</tspan></text>
+    <text class="st0" transform="translate(382.99 179.7)"><tspan x="0" y="0">♞</tspan></text>
+    <text class="st3" transform="translate(469.6 179.7)"><tspan x="0" y="0">♟</tspan></text>
+    <text class="st0" transform="translate(469.6 179.7)"><tspan x="0" y="0">♟</tspan></text>
   </g>
 </svg>
