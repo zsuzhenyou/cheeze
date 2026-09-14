@@ -484,22 +484,8 @@ function updateMaterialScoreDisplay() {
 // CREATE MOVE HISTORY PANEL
 // ======================================================
 
-function createMoveHistoryPanel() {
-  if (!moveHistoryPanel) {
-    return null;
-  }
-
-  let table = document.getElementById("move-history-table");
-
-  if (!table) {
-    table = document.createElement("div");
-
-    table.id = "move-history-table";
-
-    moveHistoryPanel.appendChild(table);
-  }
-
-  return moveHistoryPanel;
+function getMoveHistoryPanels() {
+  return [...document.querySelectorAll(".move-history")];
 }
 
 // ======================================================
@@ -507,71 +493,26 @@ function createMoveHistoryPanel() {
 // ======================================================
 
 function updateMoveHistoryDisplay() {
-  const container = createMoveHistoryPanel();
+  getMoveHistoryPanels().forEach((container) => {
+    container.innerHTML = "";
 
-  if (!container) {
-    return;
-  }
+    const table = document.createElement("div");
+    table.className = "move-history-table";
+    table.innerHTML = "<div class=\"move-history-header\"><div>#</div><div>WHITE</div><div>BLACK</div></div>";
 
-  const table = document.getElementById("move-history-table");
+    moveHistory.forEach((move, index) => {
+      const row = document.createElement("div");
+      row.className = "move-history-row";
+      const isLatest = index === moveHistory.length - 1;
+      const whiteClass = isLatest && move.white && !move.black ? " latest-move" : "";
+      const blackClass = isLatest && move.black ? " latest-move" : "";
+      row.innerHTML = `<div>${move.number}.</div><div class="${whiteClass.trim()}">${move.white || ""}</div><div class="${blackClass.trim()}">${move.black || ""}</div>`;
+      table.appendChild(row);
+    });
 
-  if (!table) {
-    return;
-  }
-
-  table.innerHTML = "";
-
-  const header = document.createElement("div");
-
-  header.className = "move-history-header";
-
-  header.innerHTML = `
-    <div>#</div>
-    <div>WHITE</div>
-    <div>BLACK</div>
-  `;
-
-  table.appendChild(header);
-
-  moveHistory.forEach((move, index) => {
-    const row = document.createElement("div");
-
-    row.className = "move-history-row";
-
-    const number = document.createElement("div");
-
-    number.textContent = move.number + ".";
-
-    const white = document.createElement("div");
-
-    white.textContent = move.white || "";
-
-    const black = document.createElement("div");
-
-    black.textContent = move.black || "";
-
-    const isLatest = index === moveHistory.length - 1;
-
-    if (isLatest) {
-      if (move.white && !move.black) {
-        white.classList.add("latest-move");
-      }
-
-      if (move.black) {
-        black.classList.add("latest-move");
-      }
-    }
-
-    row.appendChild(number);
-
-    row.appendChild(white);
-
-    row.appendChild(black);
-
-    table.appendChild(row);
+    container.appendChild(table);
+    container.scrollTop = container.scrollHeight;
   });
-
-  moveHistoryPanel.scrollTop = moveHistoryPanel.scrollHeight;
 }
 
 // ======================================================
@@ -3865,6 +3806,7 @@ function connectOnlineSocket() {
     AI_ENABLED = false;
     AI_COLOR = null;
     onlineGameStarted = true;
+    moveHistory = [];
 
     if (data && data.fen) {
       pieces = fenToPieces(data.fen);
@@ -3942,6 +3884,11 @@ function connectOnlineSocket() {
           toCol: to.col,
         };
       }
+
+      addMoveToHistory(
+        data.move.color === "w" ? "white" : "black",
+        data.move.san || `${data.move.from}-${data.move.to}`,
+      );
     }
 
     // ==========================================
@@ -4024,6 +3971,8 @@ function createOnlineRoom() {
     onlineRoomId = result.roomId;
     onlineColor = normalizeOnlineColor(result.color || "white");
     onlineGameStarted = false;
+    moveHistory = [];
+    updateMoveHistoryDisplay();
 
     showOnlineRoomPanel();
 
@@ -4066,6 +4015,8 @@ function joinOnlineRoom() {
     onlineRoomId = result.roomId || roomId;
     onlineColor = normalizeOnlineColor(result.color || "black");
     onlineGameStarted = true;
+    moveHistory = [];
+    updateMoveHistoryDisplay();
 
     showOnlineRoomPanel();
 

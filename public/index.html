@@ -94,6 +94,11 @@
             </div>
           </section>
 
+          <section class="panel record-panel">
+            <div class="panel-header"><span>GAME RECORD</span></div>
+            <div id="normal-move-history" class="move-history"></div>
+          </section>
+
           <section class="panel action-panel">
             <div class="panel-header">
               <span>GAME</span>
@@ -101,17 +106,13 @@
 
             <div id="game-actions">
               <button type="button" onclick="resetGame()">RESTART</button>
-
               <button type="button" onclick="flipBoard()">FLIP BOARD</button>
+            </div>
 
-              <button type="button" onclick="openOnlineMode()">
-                ONLINE MODE
-              </button>
-
-              <button type="button" onclick="openTrainingMode()">
-                TRAINING MODE
-              </button>
-
+            <div class="action-group-label">CHANGE MODE</div>
+            <div id="mode-actions">
+              <button type="button" onclick="openOnlineMode()">ONLINE MODE</button>
+              <button type="button" onclick="openTrainingMode()">TRAINING MODE</button>
               <button type="button" onclick="showMainMenu()">MAIN MENU</button>
             </div>
           </section>
@@ -184,6 +185,7 @@
           </div>
 
           <div id="online-room-panel" class="online-room-panel hidden">
+            <div class="panel-header"><span>GAME STATUS</span></div>
             <div id="online-room-info">
               <span>ROOM:</span>
               <strong id="current-room-id">—</strong>
@@ -196,9 +198,20 @@
 
             <div id="online-status" role="status">尚未連線</div>
 
-            <button type="button" onclick="leaveOnlineRoom()">
-              LEAVE ROOM
-            </button>
+            <div class="online-record">
+              <div class="panel-header"><span>GAME RECORD</span></div>
+              <div id="online-move-history" class="move-history"></div>
+            </div>
+
+            <div class="action-group-label">BOARD</div>
+            <div id="online-board-actions" class="compact-actions">
+              <button type="button" onclick="flipBoard()">FLIP BOARD</button>
+            </div>
+
+            <div class="action-group-label">ROOM</div>
+            <div class="compact-actions">
+              <button type="button" onclick="leaveOnlineRoom()">LEAVE ROOM</button>
+            </div>
           </div>
         </section>
 
@@ -220,7 +233,7 @@
                   <span>GAME RECORD</span>
                 </div>
 
-                <div id="training-move-history"></div>
+                <div id="training-move-history" class="move-history"></div>
               </section>
 
               <section class="panel action-panel">
@@ -236,14 +249,11 @@
                   <button type="button" onclick="flipBoard()">
                     FLIP BOARD
                   </button>
-
-                  <button type="button" onclick="closeTrainingMode()">
-                    BACK
-                  </button>
-
-                  <button type="button" onclick="showMainMenu()">
-                    MAIN MENU
-                  </button>
+                </div>
+                <div class="action-group-label">NAVIGATION</div>
+                <div id="training-navigation-actions" class="compact-actions">
+                  <button type="button" onclick="closeTrainingMode()">BACK</button>
+                  <button type="button" onclick="showMainMenu()">MAIN MENU</button>
                 </div>
               </section>
             </div>
