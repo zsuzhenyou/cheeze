@@ -15,21 +15,37 @@
         <h1>CHESS</h1>
         <p>made by Chris Su</p>
       </div>
+      <button type="button" id="settings-button" onclick="openSettings()" aria-haspopup="dialog" data-i18n="settings">SETTINGS</button>
     </header>
+
+    <div id="settings-modal" class="settings-modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="settings-card">
+        <div class="settings-heading">
+          <h2 id="settings-title" data-i18n="settings">SETTINGS</h2>
+          <button type="button" class="settings-close" onclick="closeSettings()" aria-label="Close settings">×</button>
+        </div>
+        <label for="language-select" class="settings-label" data-i18n="language">LANGUAGE</label>
+        <select id="language-select" onchange="setLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="zh-TW">繁體中文</option>
+        </select>
+        <p class="settings-note" data-i18n="settingsNote">More settings will appear here in future updates.</p>
+      </div>
+    </div>
 
     <main id="main-menu">
       <section class="menu-card">
         <h2>CHESS</h2>
 
-        <p class="menu-subtitle">CHOOSE A GAME MODE</p>
+        <p class="menu-subtitle" data-i18n="chooseMode">CHOOSE A GAME MODE</p>
 
         <div class="menu-actions">
           <button type="button" class="menu-button" onclick="startNormalMode()">
-            NORMAL MODE
+            <span data-i18n="normalMode">NORMAL MODE</span>
           </button>
 
           <button type="button" class="menu-button" onclick="startOnlineMode()">
-            ONLINE MODE
+            <span data-i18n="onlineMode">ONLINE MODE</span>
           </button>
 
           <button
@@ -37,7 +53,7 @@
             class="menu-button"
             onclick="startTrainingMode()"
           >
-            TRAINING MODE
+            <span data-i18n="trainingMode">TRAINING MODE</span>
           </button>
         </div>
       </section>
@@ -53,7 +69,7 @@
         <div id="normal-panel">
           <section class="panel status-panel">
             <div class="panel-header">
-              <span>GAME STATUS</span>
+              <span data-i18n="gameStatus">GAME STATUS</span>
             </div>
 
             <div id="turn">White's Turn</div>
@@ -62,7 +78,7 @@
 
           <section class="panel player-panel">
             <div class="panel-header">
-              <span>PLAY AS</span>
+              <span data-i18n="playAs">PLAY AS</span>
             </div>
 
             <div id="controls">
@@ -71,7 +87,7 @@
                 data-color="white"
                 onclick="setPlayerColor('white')"
               >
-                WHITE
+                <span data-i18n="white">WHITE</span>
               </button>
 
               <button
@@ -79,41 +95,41 @@
                 data-color="black"
                 onclick="setPlayerColor('black')"
               >
-                BLACK
+                <span data-i18n="black">BLACK</span>
               </button>
             </div>
           </section>
 
           <section class="panel difficulty-panel">
-            <div class="panel-header"><span>AI DIFFICULTY</span></div>
+            <div class="panel-header"><span data-i18n="aiDifficulty">AI DIFFICULTY</span></div>
             <div id="difficulty-controls" role="group" aria-label="AI difficulty">
-              <button type="button" data-difficulty="beginner" onclick="setAIDifficulty('beginner')">BEGINNER</button>
-              <button type="button" data-difficulty="easy" onclick="setAIDifficulty('easy')">EASY</button>
-              <button type="button" data-difficulty="normal" onclick="setAIDifficulty('normal')">NORMAL</button>
-              <button type="button" data-difficulty="hard" onclick="setAIDifficulty('hard')">HARD</button>
+              <button type="button" data-difficulty="beginner" onclick="setAIDifficulty('beginner')" data-i18n="beginner">BEGINNER</button>
+              <button type="button" data-difficulty="easy" onclick="setAIDifficulty('easy')" data-i18n="easy">EASY</button>
+              <button type="button" data-difficulty="normal" onclick="setAIDifficulty('normal')" data-i18n="normal">NORMAL</button>
+              <button type="button" data-difficulty="hard" onclick="setAIDifficulty('hard')" data-i18n="hard">HARD</button>
             </div>
           </section>
 
           <section class="panel record-panel">
-            <div class="panel-header"><span>GAME RECORD</span></div>
+            <div class="panel-header"><span data-i18n="gameRecord">GAME RECORD</span></div>
             <div id="normal-move-history" class="move-history"></div>
           </section>
 
           <section class="panel action-panel">
             <div class="panel-header">
-              <span>GAME</span>
+              <span data-i18n="game">GAME</span>
             </div>
 
             <div id="game-actions">
-              <button type="button" onclick="resetGame()">RESTART</button>
-              <button type="button" onclick="flipBoard()">FLIP BOARD</button>
+              <button type="button" onclick="resetGame()" data-i18n="restart">RESTART</button>
+              <button type="button" onclick="flipBoard()" data-i18n="flipBoard">FLIP BOARD</button>
             </div>
 
-            <div class="action-group-label">CHANGE MODE</div>
+            <div class="action-group-label" data-i18n="changeMode">CHANGE MODE</div>
             <div id="mode-actions">
-              <button type="button" onclick="openOnlineMode()">ONLINE MODE</button>
-              <button type="button" onclick="openTrainingMode()">TRAINING MODE</button>
-              <button type="button" onclick="showMainMenu()">MAIN MENU</button>
+              <button type="button" onclick="openOnlineMode()" data-i18n="onlineMode">ONLINE MODE</button>
+              <button type="button" onclick="openTrainingMode()" data-i18n="trainingMode">TRAINING MODE</button>
+              <button type="button" onclick="showMainMenu()" data-i18n="mainMenu">MAIN MENU</button>
             </div>
           </section>
         </div>
@@ -121,7 +137,7 @@
         <!-- 線上模式：與 normal-panel 同層，不可放入 normal-panel 裡 -->
         <section id="online-panel" class="panel online-panel hidden">
           <div class="panel-header">
-            <span>ONLINE MODE</span>
+            <span data-i18n="onlineMode">ONLINE MODE</span>
           </div>
 
           <div id="online-menu" class="online-menu">
@@ -130,7 +146,7 @@
               id="create-room-menu-btn"
               onclick="showCreateRoom()"
             >
-              CREATE ROOM
+              <span data-i18n="createRoom">CREATE ROOM</span>
             </button>
 
             <button
@@ -138,14 +154,14 @@
               id="join-room-menu-btn"
               onclick="showJoinRoom()"
             >
-              JOIN ROOM
+              <span data-i18n="joinRoom">JOIN ROOM</span>
             </button>
 
-            <button type="button" onclick="closeOnlineMode()">BACK</button>
+            <button type="button" onclick="closeOnlineMode()" data-i18n="back">BACK</button>
           </div>
 
           <div id="create-room-panel" class="online-sub-panel hidden">
-            <div class="online-label">CREATE ROOM</div>
+            <div class="online-label" data-i18n="createRoom">CREATE ROOM</div>
 
             <p class="online-description">建立房間後，將房間 ID 分享給對手。</p>
 
@@ -154,14 +170,14 @@
               type="button"
               onclick="createOnlineRoom()"
             >
-              CREATE ROOM
+              <span data-i18n="createRoom">CREATE ROOM</span>
             </button>
 
-            <button type="button" onclick="showOnlineMenu()">BACK</button>
+            <button type="button" onclick="showOnlineMenu()" data-i18n="back">BACK</button>
           </div>
 
           <div id="join-room-panel" class="online-sub-panel hidden">
-            <div class="online-label">JOIN ROOM</div>
+            <div class="online-label" data-i18n="joinRoom">JOIN ROOM</div>
 
             <div class="join-room-group">
               <input
@@ -177,40 +193,40 @@
                 type="button"
                 onclick="joinOnlineRoom()"
               >
-                JOIN ROOM
+                <span data-i18n="joinRoom">JOIN ROOM</span>
               </button>
             </div>
 
-            <button type="button" onclick="showOnlineMenu()">BACK</button>
+            <button type="button" onclick="showOnlineMenu()" data-i18n="back">BACK</button>
           </div>
 
           <div id="online-room-panel" class="online-room-panel hidden">
-            <div class="panel-header"><span>GAME STATUS</span></div>
+            <div class="panel-header"><span data-i18n="gameStatus">GAME STATUS</span></div>
             <div id="online-room-info">
-              <span>ROOM:</span>
+              <span data-i18n="room">ROOM</span><span>:</span>
               <strong id="current-room-id">—</strong>
             </div>
 
             <div id="online-player-info">
-              <span>COLOR:</span>
+              <span data-i18n="color">COLOR</span><span>:</span>
               <strong id="current-player-color">—</strong>
             </div>
 
             <div id="online-status" role="status">尚未連線</div>
 
             <div class="online-record">
-              <div class="panel-header"><span>GAME RECORD</span></div>
+              <div class="panel-header"><span data-i18n="gameRecord">GAME RECORD</span></div>
               <div id="online-move-history" class="move-history"></div>
             </div>
 
-            <div class="action-group-label">BOARD</div>
+            <div class="action-group-label" data-i18n="board">BOARD</div>
             <div id="online-board-actions" class="compact-actions">
-              <button type="button" onclick="flipBoard()">FLIP BOARD</button>
+              <button type="button" onclick="flipBoard()" data-i18n="flipBoard">FLIP BOARD</button>
             </div>
 
-            <div class="action-group-label">ROOM</div>
+            <div class="action-group-label" data-i18n="room">ROOM</div>
             <div class="compact-actions">
-              <button type="button" onclick="leaveOnlineRoom()">LEAVE ROOM</button>
+              <button type="button" onclick="leaveOnlineRoom()" data-i18n="leaveRoom">LEAVE ROOM</button>
             </div>
           </div>
         </section>
@@ -221,7 +237,7 @@
             <div class="training-info-column">
               <section class="panel status-panel">
                 <div class="panel-header">
-                  <span>GAME STATUS</span>
+                  <span data-i18n="gameStatus">GAME STATUS</span>
                 </div>
 
                 <div id="training-turn">White's Turn</div>
@@ -230,7 +246,7 @@
 
               <section class="panel record-panel">
                 <div class="panel-header">
-                  <span>GAME RECORD</span>
+                  <span data-i18n="gameRecord">GAME RECORD</span>
                 </div>
 
                 <div id="training-move-history" class="move-history"></div>
@@ -238,36 +254,36 @@
 
               <section class="panel action-panel">
                 <div class="panel-header">
-                  <span>GAME</span>
+                  <span data-i18n="game">GAME</span>
                 </div>
 
                 <div id="training-game-actions">
                   <button type="button" onclick="resetTrainingGame()">
-                    RESET
+                    <span data-i18n="reset">RESET</span>
                   </button>
 
                   <button type="button" onclick="flipBoard()">
-                    FLIP BOARD
+                    <span data-i18n="flipBoard">FLIP BOARD</span>
                   </button>
                 </div>
-                <div class="action-group-label">NAVIGATION</div>
+                <div class="action-group-label" data-i18n="navigation">NAVIGATION</div>
                 <div id="training-navigation-actions" class="compact-actions">
-                  <button type="button" onclick="closeTrainingMode()">BACK</button>
-                  <button type="button" onclick="showMainMenu()">MAIN MENU</button>
+                  <button type="button" onclick="closeTrainingMode()" data-i18n="back">BACK</button>
+                  <button type="button" onclick="showMainMenu()" data-i18n="mainMenu">MAIN MENU</button>
                 </div>
               </section>
             </div>
 
             <section class="panel training-main-panel">
               <div class="panel-header">
-                <span>TRAINING MODE</span>
+                <span data-i18n="trainingMode">TRAINING MODE</span>
               </div>
 
               <div class="training-section">
-                <div class="training-label">PIECES</div>
+                <div class="training-label" data-i18n="pieces">PIECES</div>
 
                 <div class="piece-group">
-                  <div class="piece-group-label">WHITE</div>
+                  <div class="piece-group-label" data-i18n="white">WHITE</div>
 
                   <div class="piece-palette">
                     <button type="button" onclick="selectSetupPiece('♔')">
@@ -292,7 +308,7 @@
                 </div>
 
                 <div class="piece-group">
-                  <div class="piece-group-label">BLACK</div>
+                  <div class="piece-group-label" data-i18n="black">BLACK</div>
 
                   <div class="piece-palette">
                     <button type="button" onclick="selectSetupPiece('♚')">
@@ -318,25 +334,25 @@
               </div>
 
               <div class="training-section">
-                <div class="training-label">TOOLS</div>
+                <div class="training-label" data-i18n="tools">TOOLS</div>
 
                 <div class="training-tools">
                   <button type="button" onclick="selectSetupPiece('erase')">
-                    ERASE
+                    <span data-i18n="erase">ERASE</span>
                   </button>
 
                   <button type="button" onclick="clearSetupBoard()">
-                    CLEAR
+                    <span data-i18n="clear">CLEAR</span>
                   </button>
 
                   <button type="button" onclick="restoreSetupBoard()">
-                    RESTORE
+                    <span data-i18n="restore">RESTORE</span>
                   </button>
                 </div>
               </div>
 
               <div class="training-section">
-                <div class="training-label">WHO STARTS?</div>
+                <div class="training-label" data-i18n="whoStarts">WHO STARTS?</div>
 
                 <div class="training-switch">
                   <label class="training-option">
@@ -346,18 +362,18 @@
                       value="white"
                       checked
                     />
-                    <span>WHITE</span>
+                    <span data-i18n="white">WHITE</span>
                   </label>
 
                   <label class="training-option">
                     <input type="radio" name="training-start" value="black" />
-                    <span>BLACK</span>
+                    <span data-i18n="black">BLACK</span>
                   </label>
                 </div>
               </div>
 
               <div class="training-section">
-                <div class="training-label">PLAY MODE</div>
+                <div class="training-label" data-i18n="playMode">PLAY MODE</div>
 
                 <div class="training-switch">
                   <label class="training-option">
@@ -368,7 +384,7 @@
                       checked
                       onchange="updateTrainingModeUI()"
                     />
-                    <span>HUMAN VS AI</span>
+                    <span data-i18n="humanVsAi">HUMAN VS AI</span>
                   </label>
 
                   <label class="training-option">
@@ -378,13 +394,13 @@
                       value="human"
                       onchange="updateTrainingModeUI()"
                     />
-                    <span>HUMAN VS HUMAN</span>
+                    <span data-i18n="humanVsHuman">HUMAN VS HUMAN</span>
                   </label>
                 </div>
               </div>
 
               <div class="training-section" id="training-player-section">
-                <div class="training-label">YOU PLAY AS</div>
+                <div class="training-label" data-i18n="playAs">YOU PLAY AS</div>
 
                 <div class="training-switch">
                   <label class="training-option">
@@ -394,12 +410,12 @@
                       value="white"
                       checked
                     />
-                    <span>WHITE</span>
+                    <span data-i18n="white">WHITE</span>
                   </label>
 
                   <label class="training-option">
                     <input type="radio" name="training-player" value="black" />
-                    <span>BLACK</span>
+                    <span data-i18n="black">BLACK</span>
                   </label>
                 </div>
               </div>
@@ -410,7 +426,7 @@
                   class="training-start-button"
                   onclick="startTrainingGame()"
                 >
-                  START TRAINING
+                  <span data-i18n="startTraining">START TRAINING</span>
                 </button>
               </div>
             </section>

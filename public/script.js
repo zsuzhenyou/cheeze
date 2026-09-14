@@ -12,6 +12,108 @@ const materialScoreDisplay = document.getElementById("material-score");
 const moveHistoryPanel = document.getElementById("training-move-history");
 
 // ======================================================
+// LANGUAGE / GLOBAL SETTINGS
+// ======================================================
+
+const TRANSLATIONS = {
+  "zh-TW": {
+    settings: "設定",
+    language: "語言",
+    settingsNote: "未來新增的功能設定將會顯示在這裡。",
+    chooseMode: "選擇遊戲模式",
+    normalMode: "一般模式",
+    onlineMode: "線上模式",
+    trainingMode: "訓練模式",
+    gameStatus: "遊戲狀態",
+    playAs: "選擇執棋方",
+    white: "白方",
+    black: "黑方",
+    aiDifficulty: "AI 難度",
+    beginner: "新手",
+    easy: "簡單",
+    normal: "普通",
+    hard: "困難",
+    gameRecord: "棋譜",
+    game: "棋局",
+    restart: "重新開始",
+    reset: "重設",
+    flipBoard: "翻轉棋盤",
+    changeMode: "切換模式",
+    mainMenu: "主選單",
+    back: "返回",
+    createRoom: "建立房間",
+    joinRoom: "加入房間",
+    leaveRoom: "離開房間",
+    room: "房間",
+    color: "顏色",
+    board: "棋盤",
+    navigation: "導覽",
+    pieces: "棋子",
+    tools: "工具",
+    erase: "移除",
+    clear: "清空",
+    restore: "還原",
+    whoStarts: "誰先開始？",
+    playMode: "對戰模式",
+    humanVsAi: "玩家對 AI",
+    humanVsHuman: "玩家對玩家",
+    startTraining: "開始訓練",
+    aiThinking: "AI 思考中…",
+    playerTurn: "玩家回合",
+    yourTurn: "輪到你了",
+    aiTurn: "AI 回合",
+    material: "子力",
+    moveNumber: "#",
+    checkmate: "將死",
+    wins: "獲勝",
+    drawStalemate: "和棋 — 無子可走",
+    drawInsufficient: "和棋 — 子力不足",
+    drawFivefold: "和棋 — 五次重複局面",
+    draw75Move: "和棋 — 75 步規則",
+    drawThreefold: "和棋 — 三次重複局面",
+    draw50Move: "和棋 — 50 步規則",
+  },
+};
+
+let currentLanguage = localStorage.getItem("chess-language") || "en";
+
+function t(key, fallback = key) {
+  return TRANSLATIONS[currentLanguage]?.[key] || fallback;
+}
+
+function openSettings() {
+  const modal = document.getElementById("settings-modal");
+  if (modal) modal.classList.remove("hidden");
+}
+
+function closeSettings() {
+  const modal = document.getElementById("settings-modal");
+  if (modal) modal.classList.add("hidden");
+}
+
+function setLanguage(language) {
+  currentLanguage = TRANSLATIONS[language] ? language : "en";
+  localStorage.setItem("chess-language", currentLanguage);
+  applyLanguage();
+}
+
+function applyLanguage() {
+  document.documentElement.lang = currentLanguage;
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    const key = element.dataset.i18n;
+    if (!element.dataset.defaultText) element.dataset.defaultText = element.textContent.trim();
+    element.textContent = t(key, element.dataset.defaultText);
+  });
+
+  const languageSelect = document.getElementById("language-select");
+  if (languageSelect) languageSelect.value = currentLanguage;
+
+  updateTurnDisplay();
+  updateMaterialScoreDisplay();
+  updateMoveHistoryDisplay();
+}
+
+// ======================================================
 // AI SETTINGS
 // ======================================================
 
@@ -474,9 +576,9 @@ function updateMaterialScoreDisplay() {
   const score = calculateMaterialScore();
 
   if (score > 0) {
-    materialScoreDisplay.textContent = `MATERIAL  +${score}`;
+    materialScoreDisplay.textContent = `${t("material", "MATERIAL")}  +${score}`;
   } else {
-    materialScoreDisplay.textContent = `MATERIAL  ${score}`;
+    materialScoreDisplay.textContent = `${t("material", "MATERIAL")}  ${score}`;
   }
 }
 
@@ -498,7 +600,7 @@ function updateMoveHistoryDisplay() {
 
     const table = document.createElement("div");
     table.className = "move-history-table";
-    table.innerHTML = "<div class=\"move-history-header\"><div>#</div><div>WHITE</div><div>BLACK</div></div>";
+    table.innerHTML = `<div class="move-history-header"><div>${t("moveNumber", "#")}</div><div>${t("white", "WHITE")}</div><div>${t("black", "BLACK")}</div></div>`;
 
     moveHistory.forEach((move, index) => {
       const row = document.createElement("div");
@@ -854,29 +956,29 @@ function updateTurnDisplay() {
   }
 
   if (aiThinking) {
-    turnDisplay.textContent = "AI is Thinking...";
+    turnDisplay.textContent = t("aiThinking", "AI is Thinking...");
     return;
   }
 
-  const turnName = currentTurn === "white" ? "White" : "Black";
+  const turnName = currentTurn === "white" ? t("white", "White") : t("black", "Black");
 
   // 訓練模式：人類對人類
   if (trainingMode && trainingPlayMode === "human") {
-    turnDisplay.textContent = `${turnName}'s Turn — Player`;
+    turnDisplay.textContent = `${turnName} — ${t("playerTurn", "Player's Turn")}`;
     return;
   }
 
   // AI 關閉時，一律視為人類回合
   if (!AI_ENABLED) {
-    turnDisplay.textContent = `${turnName}'s Turn — Player`;
+    turnDisplay.textContent = `${turnName} — ${t("playerTurn", "Player's Turn")}`;
     return;
   }
 
   // AI 對戰模式
   if (currentTurn === playerColor) {
-    turnDisplay.textContent = `${turnName}'s Turn — Your Turn`;
+    turnDisplay.textContent = `${turnName} — ${t("yourTurn", "Your Turn")}`;
   } else {
-    turnDisplay.textContent = `${turnName}'s Turn — AI`;
+    turnDisplay.textContent = `${turnName} — ${t("aiTurn", "AI's Turn")}`;
   }
 }
 
@@ -3359,6 +3461,11 @@ createBoard();
 
 updatePlayerColorUI();
 updateAIDifficultyUI();
+applyLanguage();
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeSettings();
+});
 
 // ======================================================
 // DEBUG
