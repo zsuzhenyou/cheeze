@@ -20,15 +20,33 @@ let AI_ENABLED = true;
 let playerColor = "white";
 let AI_COLOR = "black";
 
-const AI_DIFFICULTY = "normal";
+let AI_DIFFICULTY = "normal";
 
 const AI_DEPTHS = {
-  easy: 2,
+  beginner: 0,
+  easy: 1,
   normal: 3,
   hard: 4,
 };
 
-const AI_DEPTH = AI_DEPTHS[AI_DIFFICULTY];
+function getAIDepth() {
+  return AI_DEPTHS[AI_DIFFICULTY];
+}
+
+function setAIDifficulty(difficulty) {
+  if (!(difficulty in AI_DEPTHS)) return;
+
+  AI_DIFFICULTY = difficulty;
+  updateAIDifficultyUI();
+}
+
+function updateAIDifficultyUI() {
+  document.querySelectorAll("#difficulty-controls button").forEach((button) => {
+    const isActive = button.dataset.difficulty === AI_DIFFICULTY;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
 
 // ======================================================
 // TRAINING MODE
@@ -2632,6 +2650,7 @@ function resetGame() {
 
   createBoard();
   updatePlayerColorUI();
+  updateAIDifficultyUI();
   updateTurnDisplay();
 
   if (AI_ENABLED && currentTurn === AI_COLOR) {
@@ -3184,6 +3203,11 @@ function findBestAIMove() {
 
   orderAIMoves(aiMoves);
 
+  // 新手難度只從合法棋步中隨機選擇，不會搜尋局面。
+  if (AI_DIFFICULTY === "beginner") {
+    return aiMoves[Math.floor(Math.random() * aiMoves.length)];
+  }
+
   let bestMove = null;
 
   let bestScore = AI_COLOR === "black" ? Infinity : -Infinity;
@@ -3193,7 +3217,7 @@ function findBestAIMove() {
 
     applySearchMove(move);
 
-    const score = minimax(AI_DEPTH - 1, -Infinity, Infinity);
+    const score = minimax(getAIDepth() - 1, -Infinity, Infinity);
 
     restoreSearchState(state);
 
@@ -3210,6 +3234,11 @@ function findBestAIMove() {
         bestMove = move;
       }
     }
+  }
+
+  // 簡單難度偶爾不選最佳步，讓玩家能把握可見的機會。
+  if (AI_DIFFICULTY === "easy" && Math.random() < 0.35) {
+    return aiMoves[Math.floor(Math.random() * aiMoves.length)];
   }
 
   return bestMove;
@@ -3388,6 +3417,7 @@ initializePositionHistory();
 createBoard();
 
 updatePlayerColorUI();
+updateAIDifficultyUI();
 
 // ======================================================
 // DEBUG
@@ -3401,7 +3431,7 @@ console.log("AI color:", AI_COLOR);
 
 console.log("AI difficulty:", AI_DIFFICULTY);
 
-console.log("AI search depth:", AI_DEPTH);
+console.log("AI search depth:", getAIDepth());
 
 console.log("AI think time:", `${AI_MIN_THINK_TIME} - ${AI_MAX_THINK_TIME} ms`);
 

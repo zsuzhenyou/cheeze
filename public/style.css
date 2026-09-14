@@ -321,6 +321,12 @@ body {
   gap: 8px;
 }
 
+#difficulty-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
 /* ======================================================
    BUTTON
 ====================================================== */
@@ -381,6 +387,13 @@ button:active {
   background: #f0d9b5;
 
   color: #181818;
+}
+
+#difficulty-controls button.active,
+#difficulty-controls button.active:hover {
+  background: #f0d9b5;
+  color: #181818;
+  border-color: #f0d9b5;
 }
 
 /* ======================================================
