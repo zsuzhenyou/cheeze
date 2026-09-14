@@ -72,6 +72,10 @@ const TRANSLATIONS = {
     draw75Move: "和棋 — 75 步規則",
     drawThreefold: "和棋 — 三次重複局面",
     draw50Move: "和棋 — 50 步規則",
+    promotionTitle: "選擇升變棋子",
+    promotionInstructions: "請選擇棋子後按確認。",
+    cancel: "取消",
+    confirmPromotion: "確認升變",
   },
 };
 
