@@ -60,6 +60,11 @@
       </div>
     </div>
 
+    <div id="entertainment-overlay" class="entertainment-overlay" aria-live="polite" aria-atomic="true">
+      <div id="entertainment-emoji" class="entertainment-emoji">♟</div>
+      <div id="entertainment-message" class="entertainment-message"></div>
+    </div>
+
     <main id="main-menu">
       <section class="menu-card">
         <div class="menu-index">01 — 03</div>
@@ -86,6 +91,11 @@
             <span class="menu-number">03</span>
             <span data-i18n="trainingMode">TRAINING MODE</span>
           </button>
+
+          <button type="button" class="menu-button entertainment-menu-button" onclick="startEntertainmentMode()">
+            <span class="menu-number">04</span>
+            <span data-i18n="entertainmentMode">ENTERTAINMENT MODE</span>
+          </button>
         </div>
       </section>
     </main>
@@ -102,6 +112,7 @@
             <button type="button" class="normal-sidebar-tab active" data-sidebar-tab="play" onclick="setNormalSidebarTab('play')" role="tab" data-i18n="sidebarPlay">PLAY</button>
             <button type="button" class="normal-sidebar-tab" data-sidebar-tab="actions" onclick="setNormalSidebarTab('actions')" role="tab" data-i18n="sidebarActions">ACTIONS</button>
           </div>
+          <div id="entertainment-indicator" class="entertainment-indicator hidden" data-i18n="entertainmentActive">ENTERTAINMENT MODE ON</div>
 
           <div id="normal-play-content">
           <section class="panel status-panel">

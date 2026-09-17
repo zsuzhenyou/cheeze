@@ -82,6 +82,13 @@ const TRANSLATIONS = {
     boardForest: "森林綠",
     sidebarPlay: "對局",
     sidebarActions: "操作",
+    entertainmentMode: "娛樂模式",
+    entertainmentActive: "娛樂模式已啟用",
+    niceMove: "漂亮的一步",
+    capture: "吃子！",
+    check: "將軍！",
+    promotion: "升變！",
+    gameOver: "棋局結束",
   },
 };
 
@@ -140,6 +147,77 @@ function setNormalSidebarTab(tab) {
   });
 }
 
+function updateEntertainmentModeUI() {
+  const indicator = document.getElementById("entertainment-indicator");
+  if (indicator) indicator.classList.toggle("hidden", !entertainmentMode);
+}
+
+function playEntertainmentSound(type) {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return;
+
+  try {
+    const context = new AudioContextClass();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const frequencies = { move: 360, capture: 160, check: 620, promotion: 780, result: 220 };
+    oscillator.frequency.value = frequencies[type] || 360;
+    oscillator.type = type === "capture" ? "square" : "sine";
+    gain.gain.setValueAtTime(0.045, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.18);
+    oscillator.connect(gain).connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.18);
+    oscillator.onended = () => context.close();
+  } catch (_error) {
+    // 音效受到瀏覽器限制時，保留視覺效果即可。
+  }
+}
+
+let entertainmentTimer = null;
+
+function triggerEntertainmentReaction() {
+  if (!entertainmentMode) return;
+
+  const overlay = document.getElementById("entertainment-overlay");
+  const emoji = document.getElementById("entertainment-emoji");
+  const message = document.getElementById("entertainment-message");
+  if (!overlay || !emoji || !message) return;
+
+  let type = "move";
+  let reaction = ["♟", "😎", "✨"];
+  let label = t("niceMove", "NICE MOVE");
+
+  if (gameOver) {
+    type = "result";
+    reaction = ["💥", "👑", "🏁"];
+    label = t("gameOver", "GAME OVER");
+  } else if (isKingInCheck(currentTurn)) {
+    type = "check";
+    reaction = ["🚨", "😱", "⚡"];
+    label = t("check", "CHECK!");
+  } else if (lastMoveWasPromotion) {
+    type = "promotion";
+    reaction = ["👑", "🔥", "🎉"];
+    label = t("promotion", "PROMOTION!");
+  } else if (lastMoveWasCapture) {
+    type = "capture";
+    reaction = ["💥", "😵", "💣"];
+    label = t("capture", "CAPTURE!");
+  }
+
+  emoji.textContent = reaction[Math.floor(Math.random() * reaction.length)];
+  message.textContent = label;
+  overlay.dataset.event = type;
+  overlay.classList.remove("show");
+  void overlay.offsetWidth;
+  overlay.classList.add("show");
+  playEntertainmentSound(type);
+
+  if (entertainmentTimer) clearTimeout(entertainmentTimer);
+  entertainmentTimer = setTimeout(() => overlay.classList.remove("show"), 820);
+}
+
 function applyLanguage() {
   document.documentElement.lang = currentLanguage;
   document.querySelectorAll("[data-i18n]").forEach((element) => {
@@ -161,6 +239,9 @@ function applyLanguage() {
 // ======================================================
 
 let AI_ENABLED = true;
+let entertainmentMode = false;
+let lastMoveWasCapture = false;
+let lastMoveWasPromotion = false;
 
 let playerColor = "white";
 let AI_COLOR = "black";
@@ -1271,6 +1352,7 @@ function makeMove(
   const capturedPiece = pieces[toRow][toCol];
 
   const isCapture = capturedPiece !== "" || moveData.enPassant === true;
+  lastMoveWasCapture = isCapture;
 
   const playerMoveColor = currentTurn;
 
@@ -1343,6 +1425,7 @@ function makeMove(
   const isWhitePromotion = movingPiece === "♙" && toRow === 0;
 
   const isBlackPromotion = movingPiece === "♟" && toRow === 7;
+  lastMoveWasPromotion = isWhitePromotion || isBlackPromotion;
   let selectedPromotion = null;
 
   if (isWhitePromotion || isBlackPromotion) {
@@ -1465,6 +1548,10 @@ function finishTurn() {
   createBoard();
 
   checkGameState();
+
+  triggerEntertainmentReaction();
+  lastMoveWasCapture = false;
+  lastMoveWasPromotion = false;
 
   if (AI_ENABLED && !gameOver && currentTurn === AI_COLOR) {
     startAITurn();
@@ -2852,6 +2939,7 @@ function promotePawn(row, col, color, promotion = "queen") {
   const promotedPiece = promotionCodeToPiece(color, promotion);
 
   pieces[row][col] = promotedPiece;
+  lastMoveWasPromotion = true;
 
   updateLastPromotionNotation(promotedPiece);
 
@@ -3454,6 +3542,10 @@ function makeAIMove(move) {
   const capturedPiece = pieces[move.toRow][move.toCol];
 
   const isCapture = capturedPiece !== "" || move.moveData.enPassant === true;
+  lastMoveWasCapture = isCapture;
+  lastMoveWasPromotion =
+    (movingPiece === "♙" && move.toRow === 0) ||
+    (movingPiece === "♟" && move.toRow === 7);
 
   const aiMoveColor = currentTurn;
 
@@ -3519,6 +3611,10 @@ function makeAIMove(move) {
     createBoard();
 
     checkGameState();
+
+    triggerEntertainmentReaction();
+    lastMoveWasCapture = false;
+    lastMoveWasPromotion = false;
 
     if (AI_ENABLED && !gameOver && currentTurn === AI_COLOR) {
       startAITurn();
@@ -3599,6 +3695,8 @@ function resetTrainingGame() {
   gameOver = false;
   aiThinking = false;
   isAnimating = false;
+  lastMoveWasCapture = false;
+  lastMoveWasPromotion = false;
 
   moveHistory = [];
   positionHistory = new Map();
@@ -3679,7 +3777,7 @@ function showMainMenu() {
   }
 }
 
-function startNormalMode() {
+function startNormalMode(isEntertainment = false) {
   const mainMenu = getElement("main-menu");
   const game = getElement("game");
 
@@ -3695,6 +3793,7 @@ function startNormalMode() {
 
   trainingMode = false;
   trainingSetup = false;
+  entertainmentMode = isEntertainment;
 
   const normalPanel = getElement("normal-panel");
   const trainingPanel = getElement("training-panel");
@@ -3716,7 +3815,12 @@ function startNormalMode() {
   AI_COLOR = oppositeColor(playerColor);
 
   setNormalSidebarTab("play");
+  updateEntertainmentModeUI();
   resetGame();
+}
+
+function startEntertainmentMode() {
+  startNormalMode(true);
 }
 
 function startTrainingMode() {
@@ -3729,6 +3833,9 @@ function startTrainingMode() {
     );
     return;
   }
+
+  entertainmentMode = false;
+  updateEntertainmentModeUI();
 
   mainMenu.classList.add("hidden");
   game.classList.remove("hidden");
@@ -3743,6 +3850,8 @@ function startOnlineMode() {
   const onlinePanel = document.getElementById("online-panel");
 
   onlineMode = true;
+  entertainmentMode = false;
+  updateEntertainmentModeUI();
   AI_ENABLED = false;
   AI_COLOR = null;
   onlineGameStarted = false;
@@ -3791,6 +3900,8 @@ function openOnlineMode() {
   });
 
   onlineMode = true;
+  entertainmentMode = false;
+  updateEntertainmentModeUI();
   AI_ENABLED = false;
   AI_COLOR = null;
   onlineGameStarted = false;

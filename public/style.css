@@ -1754,3 +1754,62 @@ footer {
 
 .menu-button:hover { background: transparent; color: #f0d9b5; transform: translateX(8px); }
 .menu-number { color: rgba(255, 255, 255, 0.35); font-size: 10px; letter-spacing: 0.08em; }
+
+.entertainment-menu-button { color: #f0d9b5; }
+
+.entertainment-indicator {
+  padding: 9px 12px;
+  border: 1px solid rgba(240, 217, 181, 0.38);
+  color: #f0d9b5;
+  background: rgba(240, 217, 181, 0.06);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-align: center;
+}
+
+.entertainment-overlay {
+  position: fixed;
+  z-index: 40;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -45%) scale(0.7);
+}
+
+.entertainment-overlay.show {
+  animation: entertainment-pop 0.82s ease-out both;
+}
+
+.entertainment-emoji {
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
+  font-size: clamp(56px, 11vw, 112px);
+  line-height: 1;
+}
+
+.entertainment-message {
+  padding: 7px 12px;
+  background: #f0d9b5;
+  color: #181818;
+  font-size: clamp(12px, 2vw, 18px);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.entertainment-overlay[data-event="check"] .entertainment-message,
+.entertainment-overlay[data-event="result"] .entertainment-message {
+  background: #e85d5d;
+  color: #fff;
+}
+
+@keyframes entertainment-pop {
+  0% { opacity: 0; transform: translate(-50%, -25%) scale(0.58) rotate(-8deg); }
+  18% { opacity: 1; transform: translate(-50%, -50%) scale(1.12) rotate(3deg); }
+  74% { opacity: 1; transform: translate(-50%, -54%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -66%) scale(0.9); }
+}
