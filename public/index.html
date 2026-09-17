@@ -62,16 +62,19 @@
 
     <main id="main-menu">
       <section class="menu-card">
+        <div class="menu-index">01 — 03</div>
         <h2>CHESS</h2>
 
         <p class="menu-subtitle" data-i18n="chooseMode">CHOOSE A GAME MODE</p>
 
         <div class="menu-actions">
           <button type="button" class="menu-button" onclick="startNormalMode()">
+            <span class="menu-number">01</span>
             <span data-i18n="normalMode">NORMAL MODE</span>
           </button>
 
           <button type="button" class="menu-button" onclick="startOnlineMode()">
+            <span class="menu-number">02</span>
             <span data-i18n="onlineMode">ONLINE MODE</span>
           </button>
 
@@ -80,6 +83,7 @@
             class="menu-button"
             onclick="startTrainingMode()"
           >
+            <span class="menu-number">03</span>
             <span data-i18n="trainingMode">TRAINING MODE</span>
           </button>
         </div>
@@ -94,6 +98,12 @@
       <aside id="side-panel">
         <!-- 一般模式：與 online-panel 同層 -->
         <div id="normal-panel">
+          <div id="normal-sidebar-tabs" class="normal-sidebar-tabs" role="tablist">
+            <button type="button" class="normal-sidebar-tab active" data-sidebar-tab="play" onclick="setNormalSidebarTab('play')" role="tab" data-i18n="sidebarPlay">PLAY</button>
+            <button type="button" class="normal-sidebar-tab" data-sidebar-tab="actions" onclick="setNormalSidebarTab('actions')" role="tab" data-i18n="sidebarActions">ACTIONS</button>
+          </div>
+
+          <div id="normal-play-content">
           <section class="panel status-panel">
             <div class="panel-header">
               <span data-i18n="gameStatus">GAME STATUS</span>
@@ -136,12 +146,14 @@
               <button type="button" data-difficulty="hard" onclick="setAIDifficulty('hard')" data-i18n="hard">HARD</button>
             </div>
           </section>
+          </div>
 
           <section class="panel record-panel">
             <div class="panel-header"><span data-i18n="gameRecord">GAME RECORD</span></div>
             <div id="normal-move-history" class="move-history"></div>
           </section>
 
+          <div id="normal-actions-content" class="hidden">
           <section class="panel action-panel">
             <div class="panel-header">
               <span data-i18n="game">GAME</span>
@@ -159,6 +171,7 @@
               <button type="button" onclick="showMainMenu()" data-i18n="mainMenu">MAIN MENU</button>
             </div>
           </section>
+          </div>
         </div>
 
         <!-- 線上模式：與 normal-panel 同層，不可放入 normal-panel 裡 -->

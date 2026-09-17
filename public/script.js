@@ -80,6 +80,8 @@ const TRANSLATIONS = {
     boardClassic: "經典木色",
     boardOcean: "深海藍",
     boardForest: "森林綠",
+    sidebarPlay: "對局",
+    sidebarActions: "操作",
   },
 };
 
@@ -119,6 +121,22 @@ function applyBoardTheme() {
     const isActive = button.dataset.boardTheme === currentBoardTheme;
     button.classList.toggle("active", isActive);
     button.setAttribute("aria-checked", String(isActive));
+  });
+}
+
+function setNormalSidebarTab(tab) {
+  const playContent = document.getElementById("normal-play-content");
+  const actionsContent = document.getElementById("normal-actions-content");
+  if (!playContent || !actionsContent) return;
+
+  const showPlay = tab === "play";
+  playContent.classList.toggle("hidden", !showPlay);
+  actionsContent.classList.toggle("hidden", showPlay);
+
+  document.querySelectorAll(".normal-sidebar-tab").forEach((button) => {
+    const isActive = button.dataset.sidebarTab === tab;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
   });
 }
 
@@ -3697,6 +3715,7 @@ function startNormalMode() {
   AI_ENABLED = true;
   AI_COLOR = oppositeColor(playerColor);
 
+  setNormalSidebarTab("play");
   resetGame();
 }
 
