@@ -79,11 +79,14 @@ const TRANSLATIONS = {
     pieceTheme: "棋子主題",
     classicPieces: "經典",
     modernPieces: "現代",
+    classicPieceImages: "經典棋子圖片",
   },
 };
 
 let currentLanguage = localStorage.getItem("chess-language") || "en";
-let currentPieceTheme = localStorage.getItem("chess-piece-theme") || "classic";
+const savedPieceTheme = localStorage.getItem("chess-piece-theme");
+let currentPieceTheme =
+  savedPieceTheme === "classic" ? "classic-pieces" : savedPieceTheme || "classic-pieces";
 
 function t(key, fallback = key) {
   return TRANSLATIONS[currentLanguage]?.[key] || fallback;
@@ -106,7 +109,7 @@ function setLanguage(language) {
 }
 
 function setPieceTheme(theme) {
-  if (!["classic", "modern"].includes(theme)) return;
+  if (!["classic", "modern", "classic-pieces"].includes(theme)) return;
   currentPieceTheme = theme;
   localStorage.setItem("chess-piece-theme", currentPieceTheme);
   createBoard();
@@ -894,12 +897,28 @@ const PIECE_SPRITE_POSITIONS = {
   "♟": { row: 1, col: 5 },
 };
 
+const PIECE_IMAGE_FILES = {
+  "♔": "king-w.png", "♕": "queen-w.png", "♖": "rook-w.png",
+  "♗": "bishop-w.png", "♘": "knight-w.png", "♙": "pawn-w.png",
+  "♚": "king-b.png", "♛": "queen-b.png", "♜": "rook-b.png",
+  "♝": "bishop-b.png", "♞": "knight-b.png", "♟": "pawn-b.png",
+};
+
 function createPieceImage(piece) {
   const position = PIECE_SPRITE_POSITIONS[piece];
-  const pieceElement = document.createElement("span");
+  const pieceElement = document.createElement(
+    currentPieceTheme === "classic-pieces" ? "img" : "span",
+  );
   pieceElement.classList.add("piece", "piece-image");
-  pieceElement.style.backgroundImage = `url("assets/pieces/${currentPieceTheme}.svg")`;
-  pieceElement.style.backgroundPosition = `${position.col * 20}% ${position.row * 100}%`;
+
+  if (currentPieceTheme === "classic-pieces") {
+    pieceElement.classList.add("piece-file-image");
+    pieceElement.src = `assets/pieces/classic-pieces/${PIECE_IMAGE_FILES[piece]}`;
+    pieceElement.alt = piece;
+  } else {
+    pieceElement.style.backgroundImage = `url("assets/pieces/${currentPieceTheme}.svg")`;
+    pieceElement.style.backgroundPosition = `${position.col * 20}% ${position.row * 100}%`;
+  }
   pieceElement.setAttribute("role", "img");
   pieceElement.setAttribute("aria-label", piece);
   return pieceElement;
