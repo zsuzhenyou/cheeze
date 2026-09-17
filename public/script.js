@@ -866,16 +866,16 @@ function finalizeMoveNotation(notation, colorWhoMoved) {
 // ======================================================
 
 const PIECE_IMAGE_FILES = {
-  "♔": "king-w.png", "♕": "queen-w.png", "♖": "rook-w.png",
-  "♗": "bishop-w.png", "♘": "knight-w.png", "♙": "pawn-w.png",
-  "♚": "king-b.png", "♛": "queen-b.png", "♜": "rook-b.png",
-  "♝": "bishop-b.png", "♞": "knight-b.png", "♟": "pawn-b.png",
+  "♔": "white-king.png", "♕": "white-queen.png", "♖": "white-rook.png",
+  "♗": "white-bishop.png", "♘": "white-knight.png", "♙": "white-pawn.png",
+  "♚": "black-king.png", "♛": "black-queen.png", "♜": "black-rook.png",
+  "♝": "black-bishop.png", "♞": "black-knight.png", "♟": "black-pawn.png",
 };
 
 function createPieceImage(piece) {
   const pieceElement = document.createElement("img");
   pieceElement.classList.add("piece", "piece-image", "piece-file-image");
-  pieceElement.src = `assets/pieces/classic-pieces/${PIECE_IMAGE_FILES[piece]}`;
+  pieceElement.src = `assets/pieces/classic/${PIECE_IMAGE_FILES[piece]}`;
   pieceElement.alt = piece;
   pieceElement.setAttribute("role", "img");
   pieceElement.setAttribute("aria-label", piece);
