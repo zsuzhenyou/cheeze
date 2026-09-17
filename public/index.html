@@ -29,6 +29,21 @@
           <option value="en">English</option>
           <option value="zh-TW">繁體中文</option>
         </select>
+        <div class="settings-label settings-label-spaced" data-i18n="boardColor">BOARD COLOR</div>
+        <div id="board-theme-options" class="board-theme-options" role="radiogroup" aria-label="Board color">
+          <button type="button" class="board-theme-option" data-board-theme="classic" onclick="setBoardTheme('classic')" role="radio">
+            <span class="board-preview board-preview-classic" aria-hidden="true"></span>
+            <span data-i18n="boardClassic">CLASSIC</span>
+          </button>
+          <button type="button" class="board-theme-option" data-board-theme="ocean" onclick="setBoardTheme('ocean')" role="radio">
+            <span class="board-preview board-preview-ocean" aria-hidden="true"></span>
+            <span data-i18n="boardOcean">OCEAN</span>
+          </button>
+          <button type="button" class="board-theme-option" data-board-theme="forest" onclick="setBoardTheme('forest')" role="radio">
+            <span class="board-preview board-preview-forest" aria-hidden="true"></span>
+            <span data-i18n="boardForest">FOREST</span>
+          </button>
+        </div>
         <p class="settings-note" data-i18n="settingsNote">More settings will appear here in future updates.</p>
       </div>
     </div>

@@ -21,6 +21,21 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+:root {
+  --board-light: #f0d9b5;
+  --board-dark: #b58863;
+}
+
+html[data-board-theme="ocean"] {
+  --board-light: #d7e6f0;
+  --board-dark: #4e7594;
+}
+
+html[data-board-theme="forest"] {
+  --board-light: #e4dfc6;
+  --board-dark: #71885a;
+}
+
 /* ======================================================
    HEADER
 ====================================================== */
@@ -120,6 +135,50 @@ body {
   font: inherit;
   font-size: 12px;
 }
+
+.settings-label-spaced {
+  margin-top: 18px;
+}
+
+.board-theme-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.board-theme-option {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 9px 5px;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+
+.board-theme-option.active,
+.board-theme-option.active:hover {
+  border-color: #f0d9b5;
+  background: #2d2d2d;
+  color: #fff;
+}
+
+.board-preview {
+  width: 34px;
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.board-preview::before,
+.board-preview::after {
+  content: "";
+  grid-row: 1 / -1;
+}
+
+.board-preview-classic { background: conic-gradient(#f0d9b5 25%, #b58863 0 50%, #f0d9b5 0 75%, #b58863 0); }
+.board-preview-ocean { background: conic-gradient(#d7e6f0 25%, #4e7594 0 50%, #d7e6f0 0 75%, #4e7594 0); }
+.board-preview-forest { background: conic-gradient(#e4dfc6 25%, #71885a 0 50%, #e4dfc6 0 75%, #71885a 0); }
 
 .settings-note {
   margin: 16px 0 0;
@@ -262,11 +321,11 @@ body {
 }
 
 .square.light {
-  background: #f0d9b5;
+  background: var(--board-light);
 }
 
 .square.dark {
-  background: #b58863;
+  background: var(--board-dark);
 }
 
 /* ======================================================
@@ -334,12 +393,12 @@ body {
 
 .square.light .file-label,
 .square.light .rank-label {
-  color: #b58863;
+  color: var(--board-dark);
 }
 
 .square.dark .file-label,
 .square.dark .rank-label {
-  color: #f0d9b5;
+  color: var(--board-light);
 }
 
 /* ======================================================

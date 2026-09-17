@@ -76,10 +76,15 @@ const TRANSLATIONS = {
     promotionInstructions: "請選擇棋子後按確認。",
     cancel: "取消",
     confirmPromotion: "確認升變",
+    boardColor: "棋盤顏色",
+    boardClassic: "經典木色",
+    boardOcean: "深海藍",
+    boardForest: "森林綠",
   },
 };
 
 let currentLanguage = localStorage.getItem("chess-language") || "en";
+let currentBoardTheme = localStorage.getItem("chess-board-theme") || "classic";
 
 function t(key, fallback = key) {
   return TRANSLATIONS[currentLanguage]?.[key] || fallback;
@@ -99,6 +104,22 @@ function setLanguage(language) {
   currentLanguage = TRANSLATIONS[language] ? language : "en";
   localStorage.setItem("chess-language", currentLanguage);
   applyLanguage();
+}
+
+function setBoardTheme(theme) {
+  if (!["classic", "ocean", "forest"].includes(theme)) return;
+  currentBoardTheme = theme;
+  localStorage.setItem("chess-board-theme", currentBoardTheme);
+  applyBoardTheme();
+}
+
+function applyBoardTheme() {
+  document.documentElement.dataset.boardTheme = currentBoardTheme;
+  document.querySelectorAll(".board-theme-option").forEach((button) => {
+    const isActive = button.dataset.boardTheme === currentBoardTheme;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-checked", String(isActive));
+  });
 }
 
 function applyLanguage() {
@@ -3494,6 +3515,7 @@ createBoard();
 
 updatePlayerColorUI();
 updateAIDifficultyUI();
+applyBoardTheme();
 applyLanguage();
 
 document.addEventListener("keydown", (event) => {
