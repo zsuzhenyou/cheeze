@@ -898,13 +898,20 @@ function createPieceImage(piece) {
   pieceElement.classList.add("piece", "piece-image", "piece-file-image");
   pieceElement.src = `assets/pieces/classic/${PIECE_IMAGE_FILES[piece]}`;
   pieceElement.alt = piece;
+  pieceElement.dataset.piece = piece;
   pieceElement.setAttribute("role", "img");
   pieceElement.setAttribute("aria-label", piece);
   return pieceElement;
 }
 
 function createBoard() {
-  board.innerHTML = "";
+  const flipChanged = board.dataset.flipped !== String(boardFlipped);
+  const needsBuild = board.children.length !== 64 || flipChanged;
+
+  if (needsBuild) {
+    board.innerHTML = "";
+    board.dataset.flipped = String(boardFlipped);
+  }
 
   for (let visualRow = 0; visualRow < 8; visualRow++) {
     for (let visualCol = 0; visualCol < 8; visualCol++) {
@@ -912,50 +919,51 @@ function createBoard() {
 
       const logicalCol = boardFlipped ? 7 - visualCol : visualCol;
 
-      const square = document.createElement("div");
+      const index = visualRow * 8 + visualCol;
+      let square = board.children[index];
 
-      square.classList.add("square");
+      if (needsBuild) {
+        square = document.createElement("div");
+        square.classList.add("square", (visualRow + visualCol) % 2 === 0 ? "light" : "dark");
+        square.style.position = "relative";
 
-      if ((visualRow + visualCol) % 2 === 0) {
-        square.classList.add("light");
-      } else {
-        square.classList.add("dark");
+        if (visualRow === 7) {
+          const fileLabel = document.createElement("span");
+          fileLabel.classList.add("file-label");
+          fileLabel.textContent = FILES[logicalCol];
+          square.appendChild(fileLabel);
+        }
+
+        if (visualCol === 0) {
+          const rankLabel = document.createElement("span");
+          rankLabel.classList.add("rank-label");
+          rankLabel.textContent = String(8 - logicalRow);
+          square.appendChild(rankLabel);
+        }
+
+        square.addEventListener("click", () => {
+          handleSquareClick(logicalRow, logicalCol);
+        });
+        board.appendChild(square);
       }
 
-      square.style.position = "relative";
-
-      if (visualRow === 7) {
-        const fileLabel = document.createElement("span");
-
-        fileLabel.classList.add("file-label");
-
-        fileLabel.textContent = FILES[logicalCol];
-
-        square.appendChild(fileLabel);
-      }
-
-      if (visualCol === 0) {
-        const rankLabel = document.createElement("span");
-
-        rankLabel.classList.add("rank-label");
-
-        rankLabel.textContent = String(8 - logicalRow);
-
-        square.appendChild(rankLabel);
-      }
+      square.classList.remove("selected", "legal-move", "last-move");
 
       const piece = pieces[logicalRow][logicalCol];
+      const existingPiece = square.querySelector(".piece");
 
-      if (piece !== "") {
+      if (piece === "" && existingPiece) {
+        existingPiece.remove();
+      } else if (piece !== "" && (!existingPiece || existingPiece.dataset.piece !== piece)) {
         const pieceElement = createPieceImage(piece);
-
         pieceElement.style.position = "relative";
-
         pieceElement.style.zIndex = "2";
-
         pieceElement.style.pointerEvents = "none";
-
-        square.appendChild(pieceElement);
+        if (existingPiece) {
+          existingPiece.replaceWith(pieceElement);
+        } else {
+          square.appendChild(pieceElement);
+        }
       }
 
       if (lastMove !== null) {
@@ -970,11 +978,6 @@ function createBoard() {
         }
       }
 
-      square.addEventListener("click", () => {
-        handleSquareClick(logicalRow, logicalCol);
-      });
-
-      board.appendChild(square);
     }
   }
 
