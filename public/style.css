@@ -111,10 +111,6 @@ body {
   letter-spacing: 0.14em;
 }
 
-.settings-label-spaced {
-  margin-top: 18px;
-}
-
 #language-select {
   width: 100%;
   padding: 11px 10px;
@@ -299,8 +295,6 @@ body {
   height: 82%;
   max-width: 62px;
   max-height: 62px;
-  background-repeat: no-repeat;
-  background-size: 600% 200%;
 }
 
 .piece-file-image {
