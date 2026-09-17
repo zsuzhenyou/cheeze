@@ -1498,6 +1498,11 @@ function animateMove(fromRow, fromCol, toRow, toCol, callback) {
 
   const pieceElement = toSquare.querySelector(".piece");
 
+  // 複製已經載入的終點棋子圖片，避免動畫開始時重新載入造成閃爍。
+  const animationPiece = pieceElement
+    ? pieceElement.cloneNode(true)
+    : createPieceImage(piece);
+
   if (pieceElement) {
     pieceElement.style.visibility = "hidden";
   }
@@ -1507,16 +1512,14 @@ function animateMove(fromRow, fromCol, toRow, toCol, callback) {
   const toRect = toSquare.getBoundingClientRect();
 
   const movingPiece = document.createElement("div");
-
-  movingPiece.textContent = piece;
+  movingPiece.classList.add("moving-piece");
+  movingPiece.appendChild(animationPiece);
 
   movingPiece.style.position = "fixed";
 
   movingPiece.style.zIndex = "9999";
 
   movingPiece.style.pointerEvents = "none";
-
-  movingPiece.style.fontSize = "55px";
 
   movingPiece.style.display = "flex";
 

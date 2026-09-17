@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="_圖層_1" data-name="圖層_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 600 200">
+<svg id="_圖層_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 600 200">
   <!-- Generator: Adobe Illustrator 30.8.1, SVG Export Plug-In . SVG Version: 2.1.4 Build 1)  -->
   <defs>
     <style>
@@ -7,58 +7,109 @@
         fill: #30231d;
       }
 
-      .st0, .st1, .st2, .st3 {
+      .st0, .st1, .st2, .st3, .st4 {
+        isolation: isolate;
+      }
+
+      .st0, .st1, .st3, .st4 {
         font-family: Menlo-Regular, Menlo;
         font-size: 112px;
-        isolation: isolate;
       }
 
       .st1 {
         fill: #f7f2e5;
       }
 
-      .st2 {
+      .st3 {
         stroke: #d5b88d;
         stroke-width: 2px;
       }
 
-      .st2, .st3 {
+      .st3, .st4 {
         fill: none;
         stroke-linejoin: round;
       }
 
-      .st3 {
+      .st4 {
         stroke: #5e4633;
         stroke-width: 4px;
       }
     </style>
   </defs>
   <g>
-    <text class="st1" transform="translate(17.11 69.97)"><tspan x="0" y="0">♔</tspan></text>
-    <text class="st3" transform="translate(17.11 69.97)"><tspan x="0" y="0">♔</tspan></text>
-    <text class="st1" transform="translate(117.11 69.97)"><tspan x="0" y="0">♕</tspan></text>
-    <text class="st3" transform="translate(117.11 69.97)"><tspan x="0" y="0">♕</tspan></text>
-    <text class="st1" transform="translate(217.11 69.97)"><tspan x="0" y="0">♖</tspan></text>
-    <text class="st3" transform="translate(217.11 69.97)"><tspan x="0" y="0">♖</tspan></text>
-    <text class="st1" transform="translate(317.11 69.97)"><tspan x="0" y="0">♗</tspan></text>
-    <text class="st3" transform="translate(317.11 69.97)"><tspan x="0" y="0">♗</tspan></text>
-    <text class="st1" transform="translate(417.11 69.97)"><tspan x="0" y="0">♘</tspan></text>
-    <text class="st3" transform="translate(417.11 69.97)"><tspan x="0" y="0">♘</tspan></text>
-    <text class="st1" transform="translate(517.11 69.97)"><tspan x="0" y="0">♙</tspan></text>
-    <text class="st3" transform="translate(517.11 69.97)"><tspan x="0" y="0">♙</tspan></text>
+    <g class="st2">
+      <text class="st1" transform="translate(17.11 79.32)"><tspan x="0" y="0">♔</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st4" transform="translate(17.11 79.32)"><tspan x="0" y="0">♔</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st1" transform="translate(117.11 79.32)"><tspan x="0" y="0">♕</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st4" transform="translate(117.11 79.32)"><tspan x="0" y="0">♕</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st1" transform="translate(217.11 79.32)"><tspan x="0" y="0">♖</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st4" transform="translate(217.11 79.32)"><tspan x="0" y="0">♖</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st1" transform="translate(317.11 79.32)"><tspan x="0" y="0">♗</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st4" transform="translate(317.11 79.32)"><tspan x="0" y="0">♗</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st1" transform="translate(417.11 79.32)"><tspan x="0" y="0">♘</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st4" transform="translate(417.11 79.32)"><tspan x="0" y="0">♘</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st1" transform="translate(517.11 79.32)"><tspan x="0" y="0">♙</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st4" transform="translate(517.11 79.32)"><tspan x="0" y="0">♙</tspan></text>
+    </g>
   </g>
   <g>
-    <text class="st0" transform="translate(17.11 169.97)"><tspan x="0" y="0">♚</tspan></text>
-    <text class="st2" transform="translate(17.11 169.97)"><tspan x="0" y="0">♚</tspan></text>
-    <text class="st0" transform="translate(117.11 169.97)"><tspan x="0" y="0">♛</tspan></text>
-    <text class="st2" transform="translate(117.11 169.97)"><tspan x="0" y="0">♛</tspan></text>
-    <text class="st0" transform="translate(217.11 169.97)"><tspan x="0" y="0">♜</tspan></text>
-    <text class="st2" transform="translate(217.11 169.97)"><tspan x="0" y="0">♜</tspan></text>
-    <text class="st0" transform="translate(317.11 169.97)"><tspan x="0" y="0">♝</tspan></text>
-    <text class="st2" transform="translate(317.11 169.97)"><tspan x="0" y="0">♝</tspan></text>
-    <text class="st0" transform="translate(417.11 169.97)"><tspan x="0" y="0">♞</tspan></text>
-    <text class="st2" transform="translate(417.11 169.97)"><tspan x="0" y="0">♞</tspan></text>
-    <text class="st0" transform="translate(517.11 169.97)"><tspan x="0" y="0">♟</tspan></text>
-    <text class="st2" transform="translate(517.11 169.97)"><tspan x="0" y="0">♟</tspan></text>
+    <g class="st2">
+      <text class="st0" transform="translate(17.11 179.32)"><tspan x="0" y="0">♚</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st3" transform="translate(17.11 179.32)"><tspan x="0" y="0">♚</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st0" transform="translate(117.11 179.32)"><tspan x="0" y="0">♛</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st3" transform="translate(117.11 179.32)"><tspan x="0" y="0">♛</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st0" transform="translate(217.11 179.32)"><tspan x="0" y="0">♜</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st3" transform="translate(217.11 179.32)"><tspan x="0" y="0">♜</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st0" transform="translate(317.11 179.32)"><tspan x="0" y="0">♝</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st3" transform="translate(317.11 179.32)"><tspan x="0" y="0">♝</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st0" transform="translate(417.11 179.32)"><tspan x="0" y="0">♞</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st3" transform="translate(417.11 179.32)"><tspan x="0" y="0">♞</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st0" transform="translate(517.11 179.32)"><tspan x="0" y="0">♟</tspan></text>
+    </g>
+    <g class="st2">
+      <text class="st3" transform="translate(517.11 179.32)"><tspan x="0" y="0">♟</tspan></text>
+    </g>
   </g>
 </svg>
