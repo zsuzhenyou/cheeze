@@ -1793,6 +1793,7 @@ footer {
 }
 
 .square-reaction[data-event="capture"] .square-reaction-clip,
+.square-reaction[data-event="threat"] .square-reaction-clip,
 .square-reaction[data-event="check"] .square-reaction-clip,
 .square-reaction[data-event="result"] .square-reaction-clip {
   background:
@@ -1846,6 +1847,7 @@ footer {
 }
 
 .square-reaction[data-event="check"] .square-reaction-label,
+.square-reaction[data-event="threat"] .square-reaction-label,
 .square-reaction[data-event="result"] .square-reaction-label {
   background: #e85d5d;
   color: #fff;

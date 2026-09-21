@@ -84,6 +84,7 @@ const TRANSLATIONS = {
     sidebarActions: "操作",
     entertainmentMode: "娛樂模式",
     entertainmentActive: "娛樂模式已啟用",
+    threat: "威脅！",
     niceMove: "漂亮的一步",
     capture: "吃子！",
     check: "將軍！",
@@ -160,7 +161,7 @@ function playEntertainmentSound(type) {
     const context = new AudioContextClass();
     const oscillator = context.createOscillator();
     const gain = context.createGain();
-    const frequencies = { move: 360, capture: 160, check: 620, promotion: 780, result: 220 };
+    const frequencies = { move: 360, threat: 520, capture: 160, check: 620, promotion: 780, result: 220 };
     oscillator.frequency.value = frequencies[type] || 360;
     oscillator.type = type === "capture" ? "square" : "sine";
     gain.gain.setValueAtTime(0.045, context.currentTime);
@@ -204,45 +205,51 @@ function showSquareReaction(row, col, type, emoji, label, delay = 0) {
   }, delay);
 }
 
+function getThreatenedPiecesFromLastMove() {
+  if (!lastMove) return [];
+
+  const movingPiece = pieces[lastMove.toRow]?.[lastMove.toCol];
+  const movingColor = getPieceColor(movingPiece);
+
+  if (!movingPiece || !movingColor) return [];
+
+  // 這裡使用「移動後棋子的攻擊格」，而不是整體合法棋步：
+  // 娛樂模式要找的是這一顆棋子剛剛威脅到的敵方棋子。
+  return getPseudoLegalMoves(lastMove.toRow, lastMove.toCol)
+    .filter((move) => {
+      const targetPiece = pieces[move.row][move.col];
+      return (
+        targetPiece !== "" &&
+        getPieceColor(targetPiece) === oppositeColor(movingColor)
+      );
+    })
+    .map((move) => ({ row: move.row, col: move.col }));
+}
+
 function triggerEntertainmentReaction() {
   if (!entertainmentMode || !lastMove) return;
 
-  let type = "move";
-  let reactions = ["♟", "😎", "✨"];
-  let label = t("niceMove", "NICE MOVE");
-  // 影片裡的反應會貼在剛離開與剛抵達的棋格上；將軍時再加上被將軍的王。
-  const targets = [
-    { row: lastMove.fromRow, col: lastMove.fromCol },
-    { row: lastMove.toRow, col: lastMove.toCol },
-  ];
+  const threatenedPieces = getThreatenedPiecesFromLastMove();
 
-  if (gameOver) {
-    type = "result";
-    reactions = ["💥", "👑", "🏁"];
-    label = t("gameOver", "GAME OVER");
-  } else if (isKingInCheck(currentTurn)) {
-    type = "check";
-    reactions = ["🚨", "😱", "⚡"];
-    label = t("check", "CHECK!");
-    const king = findKing(currentTurn);
-    if (king) targets.push(king);
-  } else if (lastMoveWasPromotion) {
-    type = "promotion";
-    reactions = ["👑", "🔥", "🎉"];
-    label = t("promotion", "PROMOTION!");
-  } else if (lastMoveWasCapture) {
-    type = "capture";
-    reactions = ["💥", "😵", "💣"];
-    label = t("capture", "CAPTURE!");
-  }
+  // 沒有新威脅時完全不播放，避免每一步都干擾對局。
+  if (threatenedPieces.length === 0) return;
 
+  const type = "threat";
+  const reactions = ["😈", "👀", "⚠️", "😮"];
+  const label = t("threat", "THREAT!");
   const emoji = reactions[Math.floor(Math.random() * reactions.length)];
+
+  // 移動方只在「落子終點」出現；所有被它直接攻擊到的敵子各自在原格出現。
+  const targets = [
+    { row: lastMove.toRow, col: lastMove.toCol },
+    ...threatenedPieces,
+  ];
   const uniqueTargets = targets.filter(
     (target, index) =>
       targets.findIndex((candidate) => candidate.row === target.row && candidate.col === target.col) === index,
   );
   uniqueTargets.forEach((target, index) =>
-    showSquareReaction(target.row, target.col, type, emoji, label, index * 120),
+    showSquareReaction(target.row, target.col, type, emoji, label, index * 110),
   );
   playEntertainmentSound(type);
 }
