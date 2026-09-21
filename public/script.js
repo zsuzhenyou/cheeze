@@ -174,48 +174,77 @@ function playEntertainmentSound(type) {
   }
 }
 
-let entertainmentTimer = null;
+function showSquareReaction(row, col, type, emoji, label, delay = 0) {
+  const visual = getVisualPosition(row, col);
+  const square = board.children[visual.row * 8 + visual.col];
+  if (!square) return;
+
+  window.setTimeout(() => {
+    const reaction = document.createElement("div");
+    reaction.className = "square-reaction";
+    reaction.dataset.event = type;
+    const clip = document.createElement("div");
+    clip.className = "square-reaction-clip";
+
+    const emojiElement = document.createElement("span");
+    emojiElement.className = "square-reaction-emoji";
+    emojiElement.textContent = emoji;
+
+    const scanline = document.createElement("span");
+    scanline.className = "square-reaction-scanline";
+
+    const labelElement = document.createElement("span");
+    labelElement.className = "square-reaction-label";
+    labelElement.textContent = label;
+
+    clip.append(emojiElement, scanline, labelElement);
+    reaction.appendChild(clip);
+    square.appendChild(reaction);
+    window.setTimeout(() => reaction.remove(), 1900);
+  }, delay);
+}
 
 function triggerEntertainmentReaction() {
-  if (!entertainmentMode) return;
-
-  const overlay = document.getElementById("entertainment-overlay");
-  const emoji = document.getElementById("entertainment-emoji");
-  const message = document.getElementById("entertainment-message");
-  if (!overlay || !emoji || !message) return;
+  if (!entertainmentMode || !lastMove) return;
 
   let type = "move";
-  let reaction = ["♟", "😎", "✨"];
+  let reactions = ["♟", "😎", "✨"];
   let label = t("niceMove", "NICE MOVE");
+  // 影片裡的反應會貼在剛離開與剛抵達的棋格上；將軍時再加上被將軍的王。
+  const targets = [
+    { row: lastMove.fromRow, col: lastMove.fromCol },
+    { row: lastMove.toRow, col: lastMove.toCol },
+  ];
 
   if (gameOver) {
     type = "result";
-    reaction = ["💥", "👑", "🏁"];
+    reactions = ["💥", "👑", "🏁"];
     label = t("gameOver", "GAME OVER");
   } else if (isKingInCheck(currentTurn)) {
     type = "check";
-    reaction = ["🚨", "😱", "⚡"];
+    reactions = ["🚨", "😱", "⚡"];
     label = t("check", "CHECK!");
+    const king = findKing(currentTurn);
+    if (king) targets.push(king);
   } else if (lastMoveWasPromotion) {
     type = "promotion";
-    reaction = ["👑", "🔥", "🎉"];
+    reactions = ["👑", "🔥", "🎉"];
     label = t("promotion", "PROMOTION!");
   } else if (lastMoveWasCapture) {
     type = "capture";
-    reaction = ["💥", "😵", "💣"];
+    reactions = ["💥", "😵", "💣"];
     label = t("capture", "CAPTURE!");
   }
 
-  emoji.textContent = reaction[Math.floor(Math.random() * reaction.length)];
-  message.textContent = label;
-  overlay.dataset.event = type;
-  overlay.classList.remove("show");
-  void overlay.offsetWidth;
-  overlay.classList.add("show");
+  const emoji = reactions[Math.floor(Math.random() * reactions.length)];
+  const uniqueTargets = targets.filter(
+    (target, index) =>
+      targets.findIndex((candidate) => candidate.row === target.row && candidate.col === target.col) === index,
+  );
+  uniqueTargets.forEach((target, index) =>
+    showSquareReaction(target.row, target.col, type, emoji, label, index * 120),
+  );
   playEntertainmentSound(type);
-
-  if (entertainmentTimer) clearTimeout(entertainmentTimer);
-  entertainmentTimer = setTimeout(() => overlay.classList.remove("show"), 820);
 }
 
 function applyLanguage() {
