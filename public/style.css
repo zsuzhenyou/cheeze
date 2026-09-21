@@ -1864,3 +1864,245 @@ footer {
   0%, 100% { transform: translate(-2%, 1%) rotate(-3deg) scale(1); }
   50% { transform: translate(2%, -2%) rotate(3deg) scale(1.08); }
 }
+
+/* ======================================================
+   SYSTEM UI - MODE LAUNCHER + UNIFIED GAME PANELS
+====================================================== */
+
+.site-header {
+  min-height: 84px;
+  padding: 16px clamp(20px, 3vw, 52px);
+  background: #000;
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.site-header h1 { font-size: 18px; letter-spacing: 0.22em; }
+.site-header p { display: none; }
+#settings-button { border-radius: 8px; background: #fff; color: #000; border-color: #fff; }
+
+#main-menu {
+  display: block;
+  padding: 0;
+  min-height: 680px;
+  background: #000;
+}
+
+#main-menu::after { display: none; }
+
+.mode-launcher {
+  min-height: calc(100vh - 140px);
+  display: grid;
+  grid-template-rows: minmax(360px, 1fr) auto;
+  overflow: hidden;
+  background: #000;
+}
+
+.mode-launcher-heading {
+  position: relative;
+  z-index: 1;
+  padding: clamp(30px, 5vw, 80px) clamp(20px, 4vw, 72px) 24px;
+}
+
+.mode-launcher-index {
+  margin: 0 0 clamp(14px, 2vw, 28px);
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.mode-launcher h2 {
+  max-width: 1100px;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(86px, 17vw, 285px);
+  font-weight: 500;
+  letter-spacing: -0.095em;
+  line-height: 0.68;
+}
+
+.mode-launcher-instruction {
+  margin: clamp(38px, 8vw, 115px) 0 0;
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.mode-drop-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(8px, 1.5vw, 28px);
+  min-height: 235px;
+  padding: 18px clamp(20px, 6vw, 130px) 72px;
+  background: #fff;
+}
+
+.mode-dropzone {
+  position: relative;
+  display: flex;
+  min-height: 155px;
+  padding: 14px;
+  align-items: flex-start;
+  justify-content: space-between;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: #000;
+  color: #fff;
+  text-align: left;
+  transition: transform 160ms ease, background 160ms ease, outline-color 160ms ease;
+}
+
+.mode-dropzone:hover,
+.mode-dropzone.selected-target,
+.mode-dropzone.drop-ready {
+  outline: 3px solid #000;
+  outline-offset: 4px;
+  background: #171717;
+  transform: translateY(-4px);
+}
+
+.mode-dropzone.drop-active { background: #f0d9b5; color: #000; transform: scale(1.04); }
+.mode-slot-number { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; }
+.mode-slot-name { align-self: flex-end; font-size: clamp(15px, 1.5vw, 25px); font-weight: 700; letter-spacing: 0.02em; }
+.mode-slot-action { position: absolute; right: 14px; bottom: 14px; opacity: 0; font-size: 8px; font-weight: 700; letter-spacing: 0.1em; transition: opacity 160ms ease; }
+.mode-dropzone:hover .mode-slot-action, .mode-dropzone.drop-active .mode-slot-action { opacity: 1; }
+
+.mode-piece-dock {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(66px, 130px));
+  justify-content: space-around;
+  gap: clamp(12px, 4vw, 72px);
+  margin: -118px clamp(20px, 11vw, 230px) 0;
+  pointer-events: none;
+}
+
+.mode-drag-piece {
+  position: relative;
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1 / 1.1;
+  padding: 12px;
+  place-items: center;
+  border: 2px solid #000;
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: manipulation;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.mode-drag-piece-light { background: #000; border-color: #000; color: #fff; }
+.mode-drag-piece span { position: absolute; top: 9px; left: 10px; font-size: 9px; font-weight: 700; letter-spacing: 0.12em; }
+.mode-drag-piece img { width: 66%; height: 66%; object-fit: contain; pointer-events: none; user-select: none; }
+.mode-drag-piece:hover, .mode-drag-piece.selected { transform: translateY(-10px) rotate(-2deg); box-shadow: 0 12px 0 #000; }
+.mode-drag-piece.dragging { opacity: 0.4; transform: scale(0.92); }
+
+.mode-launcher-status {
+  position: relative;
+  z-index: 2;
+  min-height: 30px;
+  margin: 0;
+  padding: 8px 20px;
+  background: #fff;
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+/* Game pages use the same monochrome frame and numbered mode identity. */
+#game {
+  width: min(1440px, calc(100% - 48px));
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  gap: clamp(22px, 3vw, 52px);
+  margin: clamp(24px, 4vw, 58px) auto;
+  align-items: start;
+}
+
+#board-area { padding: 0; background: #000; }
+#chessboard { border: 2px solid #fff; box-shadow: 12px 12px 0 rgba(255, 255, 255, 0.12); }
+
+#side-panel, #normal-panel, .training-info-column { gap: 12px; }
+.panel, .normal-sidebar-tabs { border-radius: 0; border-color: rgba(255, 255, 255, 0.2); background: #0b0b0b; }
+.panel { padding: 17px; }
+
+.mode-panel-identity {
+  display: flex;
+  min-height: 82px;
+  align-items: stretch;
+  background: #fff;
+  color: #000;
+}
+
+.mode-panel-code {
+  display: grid;
+  min-width: 78px;
+  padding: 12px;
+  place-items: end start;
+  background: #000;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+
+.mode-panel-identity > div { display: grid; gap: 4px; align-content: center; padding: 12px 15px; }
+.mode-panel-eyebrow { color: rgba(0, 0, 0, 0.58); font-size: 9px; font-weight: 700; letter-spacing: 0.16em; }
+.mode-panel-identity strong { font-size: 15px; letter-spacing: 0.03em; }
+
+.normal-sidebar-tabs { padding: 0; gap: 0; }
+.normal-sidebar-tab { padding: 12px 8px; }
+.normal-sidebar-tab.active, .normal-sidebar-tab.active:hover { background: #fff; color: #000; }
+
+.panel-header, .action-group-label { color: rgba(255, 255, 255, 0.5); }
+#turn { font-size: 19px; }
+
+.match-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin-top: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.17);
+  background: rgba(255, 255, 255, 0.17);
+}
+
+.match-summary > div { display: grid; gap: 5px; min-height: 55px; padding: 9px; background: #0b0b0b; }
+.match-summary span { color: rgba(255, 255, 255, 0.46); font-size: 8px; font-weight: 700; letter-spacing: 0.15em; }
+.match-summary strong { font-size: 11px; letter-spacing: 0.04em; }
+
+.online-panel > .mode-panel-identity { margin: -17px -17px 18px; }
+.online-menu button:first-child, .training-start-button { border-color: #fff; background: #fff; color: #000; }
+.training-layout { gap: 12px; }
+
+@media (max-width: 800px) {
+  #main-menu { min-height: 0; }
+  .mode-launcher { min-height: calc(100vh - 120px); grid-template-rows: minmax(320px, 1fr) auto; }
+  .mode-drop-grid { min-height: 205px; padding: 14px 16px 58px; gap: 9px; }
+  .mode-dropzone { min-height: 128px; padding: 9px; }
+  .mode-slot-name { writing-mode: vertical-rl; align-self: flex-end; }
+  .mode-piece-dock { grid-template-columns: repeat(4, minmax(48px, 88px)); gap: 9px; margin: -94px 24px 0; }
+  .mode-launcher-instruction { margin-top: 44px; }
+  #game { width: min(680px, calc(100% - 28px)); grid-template-columns: 1fr; gap: 22px; }
+  #side-panel { display: flex; }
+}
+
+@media (max-width: 480px) {
+  .site-header { min-height: 66px; }
+  .mode-launcher { grid-template-rows: minmax(290px, 1fr) auto; }
+  .mode-launcher h2 { font-size: clamp(70px, 24vw, 112px); }
+  .mode-launcher-heading { padding: 30px 20px 18px; }
+  .mode-launcher-instruction { max-width: 220px; margin-top: 38px; line-height: 1.5; }
+  .mode-slot-number { font-size: 8px; }
+  .mode-piece-dock { grid-template-columns: repeat(4, minmax(42px, 66px)); margin: -82px 17px 0; }
+  .mode-drag-piece { padding: 5px; }
+  .mode-drag-piece span { top: 5px; left: 6px; font-size: 7px; }
+  .match-summary { grid-template-columns: 1fr; }
+}

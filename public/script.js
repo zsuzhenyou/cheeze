@@ -84,6 +84,15 @@ const TRANSLATIONS = {
     sidebarActions: "操作",
     entertainmentMode: "娛樂模式",
     entertainmentActive: "娛樂模式已啟用",
+    singleMode: "單人",
+    versusMode: "對戰",
+    customMode: "自定義",
+    dragModeHint: "將相同編號的棋子拖入模式格",
+    dropModeHint: "放開開始",
+    selectModeHint: "已選擇 {mode}，請選擇相同模式格。",
+    wrongModeHint: "請將棋子放入相同編號的模式格。",
+    you: "你",
+    opponent: "對手",
     threat: "威脅！",
     niceMove: "漂亮的一步",
     capture: "吃子！",
@@ -151,6 +160,13 @@ function setNormalSidebarTab(tab) {
 function updateEntertainmentModeUI() {
   const indicator = document.getElementById("entertainment-indicator");
   if (indicator) indicator.classList.toggle("hidden", !entertainmentMode);
+
+  const code = document.getElementById("normal-mode-code");
+  const eyebrow = document.getElementById("normal-mode-eyebrow");
+  const name = document.getElementById("normal-mode-name");
+  if (code) code.textContent = entertainmentMode ? "03" : "01";
+  if (eyebrow) eyebrow.textContent = entertainmentMode ? t("entertainmentMode", "ENTERTAINMENT") : t("singleMode", "SINGLE");
+  if (name) name.textContent = entertainmentMode ? t("entertainmentMode", "ENTERTAINMENT MODE") : t("normalMode", "NORMAL MODE");
 }
 
 function playEntertainmentSound(type) {
@@ -268,6 +284,103 @@ function applyLanguage() {
   updateTurnDisplay();
   updateMaterialScoreDisplay();
   updateMoveHistoryDisplay();
+  updateSingleMatchSummary();
+  updateEntertainmentModeUI();
+}
+
+// ======================================================
+// MODE LAUNCHER
+// ======================================================
+
+let draggedLaunchMode = null;
+let selectedLaunchMode = null;
+
+function getModeLabel(mode) {
+  const labels = {
+    normal: t("singleMode", "SINGLE"),
+    online: t("versusMode", "VERSUS"),
+    entertainment: t("entertainmentMode", "ENTERTAINMENT"),
+    training: t("customMode", "CUSTOM"),
+  };
+  return labels[mode] || mode;
+}
+
+function setModeLauncherStatus(message = "") {
+  const status = document.getElementById("mode-launcher-status");
+  if (status) status.textContent = message;
+}
+
+function selectLaunchPiece(mode) {
+  selectedLaunchMode = selectedLaunchMode === mode ? null : mode;
+  document.querySelectorAll(".mode-drag-piece").forEach((piece) => {
+    piece.classList.toggle("selected", piece.dataset.mode === selectedLaunchMode);
+  });
+  document.querySelectorAll(".mode-dropzone").forEach((zone) => {
+    zone.classList.toggle("selected-target", zone.dataset.mode === selectedLaunchMode);
+  });
+  setModeLauncherStatus(
+    selectedLaunchMode
+      ? t("selectModeHint", "{mode} selected. Choose its matching mode.").replace("{mode}", getModeLabel(selectedLaunchMode))
+      : "",
+  );
+}
+
+function launchGameMode(mode) {
+  if (selectedLaunchMode && selectedLaunchMode !== mode) {
+    setModeLauncherStatus(t("wrongModeHint", "Use the matching numbered mode."));
+    return;
+  }
+
+  selectedLaunchMode = null;
+  draggedLaunchMode = null;
+
+  if (mode === "normal") startNormalMode();
+  if (mode === "online") startOnlineMode();
+  if (mode === "entertainment") startEntertainmentMode();
+  if (mode === "training") startTrainingMode();
+}
+
+function handleModeDragStart(event) {
+  const piece = event.currentTarget;
+  draggedLaunchMode = piece.dataset.mode;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", draggedLaunchMode);
+  piece.classList.add("dragging");
+  document.querySelectorAll(".mode-dropzone").forEach((zone) => {
+    zone.classList.toggle("drop-ready", zone.dataset.mode === draggedLaunchMode);
+  });
+}
+
+function handleModeDragOver(event, mode) {
+  if (draggedLaunchMode !== mode) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+  event.currentTarget.classList.add("drop-active");
+}
+
+function handleModeDragLeave(event) {
+  event.currentTarget.classList.remove("drop-active");
+}
+
+function handleModeDrop(event, mode) {
+  event.preventDefault();
+  const draggedMode = event.dataTransfer.getData("text/plain") || draggedLaunchMode;
+  event.currentTarget.classList.remove("drop-active");
+
+  if (draggedMode !== mode) {
+    setModeLauncherStatus(t("wrongModeHint", "Use the matching numbered mode."));
+    return;
+  }
+
+  launchGameMode(mode);
+}
+
+function handleModeDragEnd(event) {
+  event.currentTarget.classList.remove("dragging");
+  document.querySelectorAll(".mode-dropzone").forEach((zone) => {
+    zone.classList.remove("drop-ready", "drop-active");
+  });
+  draggedLaunchMode = null;
 }
 
 // ======================================================
@@ -300,6 +413,7 @@ function setAIDifficulty(difficulty) {
 
   AI_DIFFICULTY = difficulty;
   updateAIDifficultyUI();
+  updateSingleMatchSummary();
 }
 
 function updateAIDifficultyUI() {
@@ -308,6 +422,17 @@ function updateAIDifficultyUI() {
     button.classList.toggle("active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
   });
+}
+
+function updateSingleMatchSummary() {
+  const playerSummary = document.getElementById("single-player-summary");
+  const opponentSummary = document.getElementById("single-opponent-summary");
+  if (playerSummary) {
+    playerSummary.textContent = t(playerColor, playerColor.toUpperCase());
+  }
+  if (opponentSummary) {
+    opponentSummary.textContent = `AI · ${t(AI_DIFFICULTY, AI_DIFFICULTY.toUpperCase())}`;
+  }
 }
 
 // ======================================================
@@ -654,6 +779,7 @@ function setPlayerColor(color) {
   boardFlipped = playerColor === "black";
 
   updatePlayerColorUI();
+  updateSingleMatchSummary();
 
   resetGame();
 }

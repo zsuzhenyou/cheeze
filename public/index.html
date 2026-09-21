@@ -61,37 +61,43 @@
     </div>
 
     <main id="main-menu">
-      <section class="menu-card">
-        <div class="menu-index">01 — 03</div>
-        <h2>CHESS</h2>
+      <section class="mode-launcher" aria-labelledby="mode-launcher-title">
+        <div class="mode-launcher-heading">
+          <p class="mode-launcher-index">01 — 04</p>
+          <h2 id="mode-launcher-title">CHESS</h2>
+          <p class="mode-launcher-instruction" data-i18n="dragModeHint">DRAG A MATCHING PIECE INTO A MODE</p>
+        </div>
 
-        <p class="menu-subtitle" data-i18n="chooseMode">CHOOSE A GAME MODE</p>
-
-        <div class="menu-actions">
-          <button type="button" class="menu-button" onclick="startNormalMode()">
-            <span class="menu-number">01</span>
-            <span data-i18n="normalMode">NORMAL MODE</span>
+        <div class="mode-drop-grid" aria-label="Game modes">
+          <button type="button" class="mode-dropzone" data-mode="normal" onclick="launchGameMode('normal')" ondragover="handleModeDragOver(event, 'normal')" ondragleave="handleModeDragLeave(event)" ondrop="handleModeDrop(event, 'normal')">
+            <span class="mode-slot-number">01</span>
+            <span class="mode-slot-name" data-i18n="singleMode">SINGLE</span>
+            <span class="mode-slot-action" data-i18n="dropModeHint">DROP TO PLAY</span>
           </button>
-
-          <button type="button" class="menu-button" onclick="startOnlineMode()">
-            <span class="menu-number">02</span>
-            <span data-i18n="onlineMode">ONLINE MODE</span>
+          <button type="button" class="mode-dropzone" data-mode="online" onclick="launchGameMode('online')" ondragover="handleModeDragOver(event, 'online')" ondragleave="handleModeDragLeave(event)" ondrop="handleModeDrop(event, 'online')">
+            <span class="mode-slot-number">02</span>
+            <span class="mode-slot-name" data-i18n="versusMode">VERSUS</span>
+            <span class="mode-slot-action" data-i18n="dropModeHint">DROP TO PLAY</span>
           </button>
-
-          <button
-            type="button"
-            class="menu-button"
-            onclick="startTrainingMode()"
-          >
-            <span class="menu-number">03</span>
-            <span data-i18n="trainingMode">TRAINING MODE</span>
+          <button type="button" class="mode-dropzone" data-mode="entertainment" onclick="launchGameMode('entertainment')" ondragover="handleModeDragOver(event, 'entertainment')" ondragleave="handleModeDragLeave(event)" ondrop="handleModeDrop(event, 'entertainment')">
+            <span class="mode-slot-number">03</span>
+            <span class="mode-slot-name" data-i18n="entertainmentMode">ENTERTAINMENT</span>
+            <span class="mode-slot-action" data-i18n="dropModeHint">DROP TO PLAY</span>
           </button>
-
-          <button type="button" class="menu-button entertainment-menu-button" onclick="startEntertainmentMode()">
-            <span class="menu-number">04</span>
-            <span data-i18n="entertainmentMode">ENTERTAINMENT MODE</span>
+          <button type="button" class="mode-dropzone" data-mode="training" onclick="launchGameMode('training')" ondragover="handleModeDragOver(event, 'training')" ondragleave="handleModeDragLeave(event)" ondrop="handleModeDrop(event, 'training')">
+            <span class="mode-slot-number">04</span>
+            <span class="mode-slot-name" data-i18n="customMode">CUSTOM</span>
+            <span class="mode-slot-action" data-i18n="dropModeHint">DROP TO PLAY</span>
           </button>
         </div>
+
+        <div class="mode-piece-dock" aria-label="Draggable game mode pieces">
+          <button type="button" class="mode-drag-piece" draggable="true" data-mode="normal" aria-label="01 Single" onclick="selectLaunchPiece('normal')" ondragstart="handleModeDragStart(event)" ondragend="handleModeDragEnd(event)"><span>01</span><img src="assets/pieces/classic/black-pawn.png" draggable="false" alt="" /></button>
+          <button type="button" class="mode-drag-piece mode-drag-piece-light" draggable="true" data-mode="online" aria-label="02 Versus" onclick="selectLaunchPiece('online')" ondragstart="handleModeDragStart(event)" ondragend="handleModeDragEnd(event)"><span>02</span><img src="assets/pieces/classic/white-pawn.png" draggable="false" alt="" /></button>
+          <button type="button" class="mode-drag-piece" draggable="true" data-mode="entertainment" aria-label="03 Entertainment" onclick="selectLaunchPiece('entertainment')" ondragstart="handleModeDragStart(event)" ondragend="handleModeDragEnd(event)"><span>03</span><img src="assets/pieces/classic/black-pawn.png" draggable="false" alt="" /></button>
+          <button type="button" class="mode-drag-piece mode-drag-piece-light" draggable="true" data-mode="training" aria-label="04 Custom" onclick="selectLaunchPiece('training')" ondragstart="handleModeDragStart(event)" ondragend="handleModeDragEnd(event)"><span>04</span><img src="assets/pieces/classic/white-pawn.png" draggable="false" alt="" /></button>
+        </div>
+        <p id="mode-launcher-status" class="mode-launcher-status" aria-live="polite"></p>
       </section>
     </main>
 
@@ -103,6 +109,10 @@
       <aside id="side-panel">
         <!-- 一般模式：與 online-panel 同層 -->
         <div id="normal-panel">
+          <div id="normal-mode-identity" class="mode-panel-identity">
+            <span id="normal-mode-code" class="mode-panel-code">01</span>
+            <div><span id="normal-mode-eyebrow" class="mode-panel-eyebrow" data-i18n="singleMode">SINGLE</span><strong id="normal-mode-name" data-i18n="normalMode">NORMAL MODE</strong></div>
+          </div>
           <div id="normal-sidebar-tabs" class="normal-sidebar-tabs" role="tablist">
             <button type="button" class="normal-sidebar-tab active" data-sidebar-tab="play" onclick="setNormalSidebarTab('play')" role="tab" data-i18n="sidebarPlay">PLAY</button>
             <button type="button" class="normal-sidebar-tab" data-sidebar-tab="actions" onclick="setNormalSidebarTab('actions')" role="tab" data-i18n="sidebarActions">ACTIONS</button>
@@ -117,6 +127,10 @@
 
             <div id="turn">White's Turn</div>
             <div id="material-score"></div>
+            <div class="match-summary" aria-label="Match information">
+              <div><span data-i18n="you">YOU</span><strong id="single-player-summary">WHITE</strong></div>
+              <div><span data-i18n="opponent">OPPONENT</span><strong id="single-opponent-summary">AI · NORMAL</strong></div>
+            </div>
           </section>
 
           <section class="panel player-panel">
@@ -182,8 +196,9 @@
 
         <!-- 線上模式：與 normal-panel 同層，不可放入 normal-panel 裡 -->
         <section id="online-panel" class="panel online-panel hidden">
-          <div class="panel-header">
-            <span data-i18n="onlineMode">ONLINE MODE</span>
+          <div class="mode-panel-identity">
+            <span class="mode-panel-code">02</span>
+            <div><span class="mode-panel-eyebrow" data-i18n="versusMode">VERSUS</span><strong data-i18n="onlineMode">ONLINE MODE</strong></div>
           </div>
 
           <div id="online-menu" class="online-menu">
@@ -281,6 +296,10 @@
         <div id="training-panel" class="hidden">
           <div class="training-layout">
             <div class="training-info-column">
+              <div class="mode-panel-identity">
+                <span class="mode-panel-code">04</span>
+                <div><span class="mode-panel-eyebrow" data-i18n="customMode">CUSTOM</span><strong data-i18n="trainingMode">TRAINING MODE</strong></div>
+              </div>
               <section class="panel status-panel">
                 <div class="panel-header">
                   <span data-i18n="gameStatus">GAME STATUS</span>
