@@ -364,56 +364,72 @@ function getReactionAsset(group) {
 function showSquareReaction(row, col, type, emoji, label, delay = 0, duration = 1900, assetUrl = "", playSound = true) {
   const visual = getVisualPosition(row, col);
   const square = board.children[visual.row * 8 + visual.col];
-  if (!square) return;
+  if (!square) return Promise.resolve();
 
-  window.setTimeout(() => {
-    const reaction = document.createElement("div");
-    reaction.className = "square-reaction";
-    reaction.dataset.event = type;
-    const clip = document.createElement("div");
-    clip.className = "square-reaction-clip";
+  return new Promise((resolve) => {
+    window.setTimeout(() => {
+      const reaction = document.createElement("div");
+      reaction.className = "square-reaction";
+      reaction.dataset.event = type;
+      const hasCustomMedia = Boolean(assetUrl);
+      reaction.classList.toggle("square-reaction-media-only", hasCustomMedia);
+      const clip = document.createElement("div");
+      clip.className = "square-reaction-clip";
+      const isVideo = /\.mp4(?:$|\?)/i.test(assetUrl);
+      const reactionMedia = assetUrl ? document.createElement(isVideo ? "video" : "img") : null;
 
-    const emojiElement = document.createElement("span");
-    emojiElement.className = "square-reaction-emoji";
-    emojiElement.textContent = emoji;
-
-    const isVideo = /\.mp4(?:$|\?)/i.test(assetUrl);
-    const reactionMedia = assetUrl ? document.createElement(isVideo ? "video" : "img") : null;
-    if (reactionMedia) {
-      reactionMedia.className = "square-reaction-media";
-      reactionMedia.src = assetUrl;
-      reactionMedia.alt = "";
-      reactionMedia.addEventListener("error", () => reactionMedia.remove(), { once: true });
-
-      if (isVideo) {
-        reactionMedia.autoplay = true;
-        reactionMedia.loop = true;
-        reactionMedia.playsInline = true;
-        reactionMedia.preload = "auto";
-        reactionMedia.muted = !playSound;
-        reactionMedia.volume = playSound ? 0.72 : 0;
-        reactionMedia.play().catch(() => {
-          // 瀏覽器禁止自動播放有聲影片時，仍保留畫面並靜音播放。
-          reactionMedia.muted = true;
-          reactionMedia.play().catch(() => reactionMedia.remove());
-        });
+      if (reactionMedia) {
+        reactionMedia.className = "square-reaction-media";
+        reactionMedia.src = assetUrl;
+        reactionMedia.alt = "";
+        if (isVideo) {
+          reactionMedia.autoplay = true;
+          reactionMedia.loop = false;
+          reactionMedia.playsInline = true;
+          reactionMedia.preload = "auto";
+          reactionMedia.muted = !playSound;
+          reactionMedia.volume = playSound ? 0.72 : 0;
+        }
       }
-    }
 
-    const scanline = document.createElement("span");
-    scanline.className = "square-reaction-scanline";
+      if (hasCustomMedia && reactionMedia) {
+        clip.append(reactionMedia);
+      } else {
+        const emojiElement = document.createElement("span");
+        emojiElement.className = "square-reaction-emoji";
+        emojiElement.textContent = emoji;
+        const scanline = document.createElement("span");
+        scanline.className = "square-reaction-scanline";
+        const labelElement = document.createElement("span");
+        labelElement.className = "square-reaction-label";
+        labelElement.textContent = label;
+        clip.append(emojiElement, scanline, labelElement);
+      }
 
-    const labelElement = document.createElement("span");
-    labelElement.className = "square-reaction-label";
-    labelElement.textContent = label;
+      reaction.appendChild(clip);
+      square.appendChild(reaction);
+      let finished = false;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        reaction.remove();
+        resolve();
+      };
 
-    clip.append(emojiElement);
-    if (reactionMedia) clip.append(reactionMedia);
-    clip.append(scanline, labelElement);
-    reaction.appendChild(clip);
-    square.appendChild(reaction);
-    window.setTimeout(() => reaction.remove(), duration);
-  }, delay);
+      if (reactionMedia?.tagName === "VIDEO") {
+        reactionMedia.addEventListener("ended", finish, { once: true });
+        reactionMedia.addEventListener("error", finish, { once: true });
+        reactionMedia.play().catch(() => {
+          // 瀏覽器禁止自動播放有聲影片時，仍保留畫面並改為靜音播放。
+          reactionMedia.muted = true;
+          reactionMedia.play().catch(finish);
+        });
+      } else {
+        if (reactionMedia) reactionMedia.addEventListener("error", finish, { once: true });
+        window.setTimeout(finish, duration);
+      }
+    }, delay);
+  });
 }
 
 function getThreatenedPiecesFromLastMove() {
@@ -437,7 +453,7 @@ function getThreatenedPiecesFromLastMove() {
     .map((move) => ({ row: move.row, col: move.col }));
 }
 
-function triggerEntertainmentReaction() {
+async function triggerEntertainmentReaction() {
   if (!entertainmentMode || !lastMove) return;
 
   const threatenedPieces = getThreatenedPiecesFromLastMove();
@@ -445,29 +461,32 @@ function triggerEntertainmentReaction() {
   // 沒有新威脅時完全不播放，避免每一步都干擾對局。
   if (threatenedPieces.length === 0) return;
 
-  const attackerDuration = 900;
+  const fallbackDuration = 1900;
   const attackerReactions = ["😈", "🫵", "⚔️"];
   const threatenedReactions = ["😱", "⚠️", "👀"];
   const attackerEmoji = attackerReactions[Math.floor(Math.random() * attackerReactions.length)];
   const threatenedEmoji = threatenedReactions[Math.floor(Math.random() * threatenedReactions.length)];
 
+  const attackerAsset = getReactionAsset("threatening");
+  const threatenedAsset = getReactionAsset("underThreat");
+  isAnimating = true;
+
   // 第一段只屬於剛移動的攻擊方；第二段才讓所有受它威脅的敵子同步出現。
-  showSquareReaction(
+  await showSquareReaction(
     lastMove.toRow,
     lastMove.toCol,
     "threatening",
     attackerEmoji,
     t("threatening", "THREATENS!"),
     0,
-    attackerDuration,
-    getReactionAsset("threatening"),
+    fallbackDuration,
+    attackerAsset,
   );
-  playEntertainmentSound("threatening");
+  if (!attackerAsset) playEntertainmentSound("threatening");
 
-  window.setTimeout(() => {
-    // 同一次威脅的所有受害棋子共用同一支隨機影片，讓畫面與音效保持一致。
-    const threatenedAsset = getReactionAsset("underThreat");
-    threatenedPieces.forEach((target) => {
+  // 同一次威脅的所有受害棋子共用同一支隨機影片，讓畫面與音效保持一致。
+  await Promise.all(
+    threatenedPieces.map((target) =>
       showSquareReaction(
         target.row,
         target.col,
@@ -475,13 +494,14 @@ function triggerEntertainmentReaction() {
         threatenedEmoji,
         t("underThreat", "UNDER THREAT!"),
         0,
-        1900,
+        fallbackDuration,
         threatenedAsset,
         true,
-      );
-    });
-    playEntertainmentSound("under-threat");
-  }, attackerDuration);
+      ),
+    ),
+  );
+  if (!threatenedAsset) playEntertainmentSound("under-threat");
+  isAnimating = false;
 }
 
 loadReactionAssets();
@@ -1923,13 +1943,14 @@ function finishTurn() {
 
   if (gameOver) stopLocalClock();
 
-  triggerEntertainmentReaction();
-  lastMoveWasCapture = false;
-  lastMoveWasPromotion = false;
+  triggerEntertainmentReaction().finally(() => {
+    lastMoveWasCapture = false;
+    lastMoveWasPromotion = false;
 
-  if (AI_ENABLED && !gameOver && currentTurn === AI_COLOR) {
-    startAITurn();
-  }
+    if (AI_ENABLED && !gameOver && currentTurn === AI_COLOR) {
+      startAITurn();
+    }
+  });
 }
 
 // ======================================================
@@ -3989,13 +4010,14 @@ function makeAIMove(move) {
 
     if (gameOver) stopLocalClock();
 
-    triggerEntertainmentReaction();
-    lastMoveWasCapture = false;
-    lastMoveWasPromotion = false;
+    triggerEntertainmentReaction().finally(() => {
+      lastMoveWasCapture = false;
+      lastMoveWasPromotion = false;
 
-    if (AI_ENABLED && !gameOver && currentTurn === AI_COLOR) {
-      startAITurn();
-    }
+      if (AI_ENABLED && !gameOver && currentTurn === AI_COLOR) {
+        startAITurn();
+      }
+    });
   });
 }
 

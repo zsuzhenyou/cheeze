@@ -1827,6 +1827,19 @@ footer {
   pointer-events: none;
 }
 
+.square-reaction.square-reaction-media-only {
+  inset: 0;
+  animation: none;
+}
+
+.square-reaction-media-only .square-reaction-clip {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
 .square-reaction-scanline {
   position: absolute;
   z-index: 3;
