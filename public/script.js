@@ -436,7 +436,7 @@ function applyLanguage() {
 // MODE LAUNCHER
 // ======================================================
 
-let selectedLaunchMode = null;
+let draggedLaunchMode = null;
 
 function getModeLabel(mode) {
   const labels = {
@@ -453,33 +453,57 @@ function setModeLauncherStatus(message = "") {
   if (status) status.textContent = message;
 }
 
-function selectLaunchPiece(mode) {
-  selectedLaunchMode = selectedLaunchMode === mode ? null : mode;
-  document.querySelectorAll(".mode-drag-piece").forEach((piece) => {
-    piece.classList.toggle("selected", piece.dataset.mode === selectedLaunchMode);
+function clearModeDragState() {
+  document.querySelectorAll(".mode-drag-piece").forEach((piece) => piece.classList.remove("dragging"));
+  document.querySelectorAll(".mode-target").forEach((target) => {
+    target.classList.remove("drop-ready", "drop-active");
   });
-  document.querySelectorAll(".mode-choice").forEach((zone) => {
-    zone.classList.toggle("selected-target", zone.dataset.mode === selectedLaunchMode);
-  });
-  setModeLauncherStatus(
-    selectedLaunchMode
-      ? t("selectModeHint", "{mode} selected. Choose its matching mode.").replace("{mode}", getModeLabel(selectedLaunchMode))
-      : "",
-  );
 }
 
-function launchGameMode(mode) {
-  if (!selectedLaunchMode) {
-    setModeLauncherStatus(t("selectPieceFirst", "Choose a piece first."));
-    return;
-  }
+function handleModeDragStart(event) {
+  const piece = event.currentTarget;
+  draggedLaunchMode = piece.dataset.mode;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", draggedLaunchMode);
+  piece.classList.add("dragging");
+  document.querySelectorAll(".mode-target").forEach((target) => {
+    target.classList.toggle("drop-ready", target.dataset.mode === draggedLaunchMode);
+  });
+  setModeLauncherStatus(t("selectModeHint", "Drag {mode} to its matching square.").replace("{mode}", getModeLabel(draggedLaunchMode)));
+}
 
-  if (selectedLaunchMode !== mode) {
+function handleModeDragOver(event, mode) {
+  if (draggedLaunchMode !== mode) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+  event.currentTarget.classList.add("drop-active");
+}
+
+function handleModeDragLeave(event) {
+  event.currentTarget.classList.remove("drop-active");
+}
+
+function handleModeDrop(event, mode) {
+  event.preventDefault();
+  const movedMode = event.dataTransfer.getData("text/plain") || draggedLaunchMode;
+  clearModeDragState();
+  draggedLaunchMode = null;
+
+  if (movedMode !== mode) {
     setModeLauncherStatus(t("wrongModeHint", "Use the matching numbered mode."));
     return;
   }
 
-  selectedLaunchMode = null;
+  launchGameMode(mode);
+}
+
+function handleModeDragEnd() {
+  clearModeDragState();
+  draggedLaunchMode = null;
+}
+
+function launchGameMode(mode) {
+  setModeLauncherStatus("");
 
   if (mode === "normal") startNormalMode();
   if (mode === "online") startOnlineMode();

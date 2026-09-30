@@ -67,20 +67,17 @@
         </div>
 
         <div class="mode-launcher-stage">
-          <div class="mode-choice-grid" aria-label="Game modes">
-            <button type="button" class="mode-choice" data-mode="normal" onclick="launchGameMode('normal')"><span data-i18n="singleMode">SINGLE</span></button>
-            <button type="button" class="mode-choice" data-mode="online" onclick="launchGameMode('online')"><span data-i18n="versusMode">VERSUS</span></button>
-            <button type="button" class="mode-choice" data-mode="entertainment" onclick="launchGameMode('entertainment')"><span data-i18n="entertainmentMode">ENTERTAINMENT</span></button>
-            <button type="button" class="mode-choice" data-mode="training" onclick="launchGameMode('training')"><span data-i18n="customMode">CUSTOM</span></button>
-          </div>
+          <div class="mode-board-grid" aria-label="Drag a chess piece to its matching game mode">
+            <div class="mode-target" data-mode="normal" ondragover="handleModeDragOver(event, 'normal')" ondragleave="handleModeDragLeave(event)" ondrop="handleModeDrop(event, 'normal')"><span data-i18n="singleMode">SINGLE</span></div>
+            <div class="mode-target" data-mode="online" ondragover="handleModeDragOver(event, 'online')" ondragleave="handleModeDragLeave(event)" ondrop="handleModeDrop(event, 'online')"><span data-i18n="versusMode">VERSUS</span></div>
+            <div class="mode-target" data-mode="entertainment" ondragover="handleModeDragOver(event, 'entertainment')" ondragleave="handleModeDragLeave(event)" ondrop="handleModeDrop(event, 'entertainment')"><span data-i18n="entertainmentMode">ENTERTAINMENT</span></div>
+            <div class="mode-target" data-mode="training" ondragover="handleModeDragOver(event, 'training')" ondragleave="handleModeDragLeave(event)" ondrop="handleModeDrop(event, 'training')"><span data-i18n="customMode">CUSTOM</span></div>
 
-          <div class="mode-piece-dock" aria-label="Mode pieces">
-            <button type="button" class="mode-drag-piece" data-mode="normal" aria-label="Single" onclick="selectLaunchPiece('normal')"><img src="assets/pieces/classic/black-pawn.png" alt="" /></button>
-            <button type="button" class="mode-drag-piece mode-drag-piece-light" data-mode="online" aria-label="Versus" onclick="selectLaunchPiece('online')"><img src="assets/pieces/classic/white-pawn.png" alt="" /></button>
-            <button type="button" class="mode-drag-piece" data-mode="entertainment" aria-label="Entertainment" onclick="selectLaunchPiece('entertainment')"><img src="assets/pieces/classic/black-pawn.png" alt="" /></button>
-            <button type="button" class="mode-drag-piece mode-drag-piece-light" data-mode="training" aria-label="Custom" onclick="selectLaunchPiece('training')"><img src="assets/pieces/classic/white-pawn.png" alt="" /></button>
+            <button type="button" draggable="true" class="mode-drag-piece" data-mode="normal" aria-label="Single" ondragstart="handleModeDragStart(event)" ondragend="handleModeDragEnd(event)"><img src="assets/pieces/classic/black-pawn.png" alt="" draggable="false" /></button>
+            <button type="button" draggable="true" class="mode-drag-piece" data-mode="online" aria-label="Versus" ondragstart="handleModeDragStart(event)" ondragend="handleModeDragEnd(event)"><img src="assets/pieces/classic/white-pawn.png" alt="" draggable="false" /></button>
+            <button type="button" draggable="true" class="mode-drag-piece" data-mode="entertainment" aria-label="Entertainment" ondragstart="handleModeDragStart(event)" ondragend="handleModeDragEnd(event)"><img src="assets/pieces/classic/black-pawn.png" alt="" draggable="false" /></button>
+            <button type="button" draggable="true" class="mode-drag-piece" data-mode="training" aria-label="Custom" ondragstart="handleModeDragStart(event)" ondragend="handleModeDragEnd(event)"><img src="assets/pieces/classic/white-pawn.png" alt="" draggable="false" /></button>
           </div>
-          <div class="mode-board" aria-hidden="true"></div>
         </div>
         <p id="mode-launcher-status" class="visually-hidden" aria-live="polite"></p>
       </section>
