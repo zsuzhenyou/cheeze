@@ -90,9 +90,19 @@ const TRANSLATIONS = {
     dragModeHint: "將相同編號的棋子拖入模式格",
     dropModeHint: "放開開始",
     selectModeHint: "已選擇 {mode}，請選擇相同模式格。",
+    selectPieceFirst: "請先選擇一顆棋子。",
     wrongModeHint: "請將棋子放入相同編號的模式格。",
     you: "你",
     opponent: "對手",
+    timeControl: "計時設定",
+    chessClock: "棋局計時",
+    unlimited: "不限時",
+    bullet: "超快棋 · 1 分鐘",
+    rapid: "中速棋 · 5 分鐘",
+    slow: "慢速棋 · 15 分鐘",
+    custom: "自訂",
+    minutesPerSide: "每方分鐘數",
+    timeOut: "時間到",
     threat: "威脅！",
     niceMove: "漂亮的一步",
     capture: "吃子！",
@@ -107,6 +117,137 @@ let currentBoardTheme = localStorage.getItem("chess-board-theme") || "classic";
 
 function t(key, fallback = key) {
   return TRANSLATIONS[currentLanguage]?.[key] || fallback;
+}
+
+// ======================================================
+// TIME CONTROLS
+// ======================================================
+
+const TIME_PRESETS = {
+  unlimited: null,
+  bullet: 1,
+  rapid: 5,
+  slow: 15,
+};
+
+let localTimeControl = { preset: "unlimited", minutes: null };
+let onlineTimeControl = { preset: "unlimited", minutes: null };
+let localClock = null;
+let localClockLastTick = 0;
+let localClockTimer = null;
+let onlineClock = null;
+let onlineClockTimer = null;
+
+function timeControlMinutes(control) {
+  if (!control || control.preset === "unlimited") return null;
+  if (control.preset === "custom") return Math.min(120, Math.max(1, Number(control.minutes) || 10));
+  return TIME_PRESETS[control.preset] || null;
+}
+
+function formatClock(milliseconds) {
+  if (milliseconds === null || milliseconds === undefined) return "∞";
+  const seconds = Math.max(0, Math.ceil(milliseconds / 1000));
+  return `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+function updateTimeControlUI(prefix, control) {
+  document.querySelectorAll(`#${prefix}-time-controls [data-time-preset]`).forEach((button) => {
+    button.classList.toggle("active", button.dataset.timePreset === control.preset);
+  });
+  const customWrap = document.getElementById(`${prefix}-custom-time-wrap`);
+  if (customWrap) customWrap.classList.toggle("hidden", control.preset !== "custom");
+}
+
+function setLocalTimeControl(preset) {
+  localTimeControl = { preset, minutes: preset === "custom" ? Number(document.getElementById("local-custom-minutes")?.value) || 10 : TIME_PRESETS[preset] };
+  updateTimeControlUI("local", localTimeControl);
+  if (!onlineMode && !trainingMode) resetGame();
+}
+
+function setLocalCustomMinutes(value) {
+  localTimeControl = { preset: "custom", minutes: Math.min(120, Math.max(1, Number(value) || 10)) };
+  updateTimeControlUI("local", localTimeControl);
+  if (!onlineMode && !trainingMode) resetGame();
+}
+
+function setOnlineTimeControl(preset) {
+  onlineTimeControl = { preset, minutes: preset === "custom" ? Number(document.getElementById("online-custom-minutes")?.value) || 10 : TIME_PRESETS[preset] };
+  updateTimeControlUI("online", onlineTimeControl);
+}
+
+function setOnlineCustomMinutes(value) {
+  onlineTimeControl = { preset: "custom", minutes: Math.min(120, Math.max(1, Number(value) || 10)) };
+  updateTimeControlUI("online", onlineTimeControl);
+}
+
+function getTimeControlPayload(control) {
+  return { preset: control.preset, minutes: timeControlMinutes(control) };
+}
+
+function stopLocalClock() {
+  if (localClockTimer !== null) clearInterval(localClockTimer);
+  localClockTimer = null;
+}
+
+function resetLocalClock() {
+  stopLocalClock();
+  const minutes = timeControlMinutes(localTimeControl);
+  if (onlineMode || trainingMode || !minutes) {
+    localClock = null;
+    updateClockDisplays();
+    return;
+  }
+  const milliseconds = minutes * 60 * 1000;
+  localClock = { white: milliseconds, black: milliseconds };
+  localClockLastTick = Date.now();
+  localClockTimer = window.setInterval(tickLocalClock, 250);
+  updateClockDisplays();
+}
+
+function tickLocalClock() {
+  if (!localClock || gameOver || onlineMode || trainingMode) return;
+  const now = Date.now();
+  const elapsed = now - localClockLastTick;
+  localClockLastTick = now;
+  localClock[currentTurn] = Math.max(0, localClock[currentTurn] - elapsed);
+  if (localClock[currentTurn] === 0) {
+    gameOver = true;
+    stopLocalClock();
+    turnDisplay.textContent = `${t(oppositeColor(currentTurn), oppositeColor(currentTurn))} ${t("wins", "Wins")} — ${t("timeOut", "Time out")}`;
+  }
+  updateClockDisplays();
+}
+
+function getOnlineClockValues() {
+  if (!onlineClock || !onlineClock.enabled) return { white: null, black: null, active: null };
+  const values = { white: onlineClock.white, black: onlineClock.black, active: onlineClock.active };
+  if (!gameOver && onlineGameStarted && values.active) {
+    values[values.active] = Math.max(0, values[values.active] - (Date.now() - onlineClock.receivedAt));
+  }
+  return values;
+}
+
+function updateClockDisplays() {
+  const localValues = localClock || { white: null, black: null, active: null };
+  ["white", "black"].forEach((color) => {
+    const localSide = document.getElementById(`local-clock-${color}`);
+    if (localSide) {
+      localSide.querySelector("strong").textContent = formatClock(localValues[color]);
+      localSide.classList.toggle("active", Boolean(localClock) && currentTurn === color && !gameOver);
+    }
+    const onlineSide = document.getElementById(`online-clock-${color}`);
+    const onlineValues = getOnlineClockValues();
+    if (onlineSide) {
+      onlineSide.querySelector("strong").textContent = formatClock(onlineValues[color]);
+      onlineSide.classList.toggle("active", onlineValues.active === color && !gameOver);
+    }
+  });
+}
+
+function applyOnlineClock(clock) {
+  onlineClock = clock ? { ...clock, active: clock.active === "w" ? "white" : clock.active === "b" ? "black" : null, receivedAt: Date.now() } : null;
+  if (onlineClockTimer === null) onlineClockTimer = window.setInterval(updateClockDisplays, 250);
+  updateClockDisplays();
 }
 
 function openSettings() {
@@ -286,13 +427,13 @@ function applyLanguage() {
   updateMoveHistoryDisplay();
   updateSingleMatchSummary();
   updateEntertainmentModeUI();
+  updateClockDisplays();
 }
 
 // ======================================================
 // MODE LAUNCHER
 // ======================================================
 
-let draggedLaunchMode = null;
 let selectedLaunchMode = null;
 
 function getModeLabel(mode) {
@@ -315,7 +456,7 @@ function selectLaunchPiece(mode) {
   document.querySelectorAll(".mode-drag-piece").forEach((piece) => {
     piece.classList.toggle("selected", piece.dataset.mode === selectedLaunchMode);
   });
-  document.querySelectorAll(".mode-dropzone").forEach((zone) => {
+  document.querySelectorAll(".mode-choice").forEach((zone) => {
     zone.classList.toggle("selected-target", zone.dataset.mode === selectedLaunchMode);
   });
   setModeLauncherStatus(
@@ -326,61 +467,22 @@ function selectLaunchPiece(mode) {
 }
 
 function launchGameMode(mode) {
-  if (selectedLaunchMode && selectedLaunchMode !== mode) {
+  if (!selectedLaunchMode) {
+    setModeLauncherStatus(t("selectPieceFirst", "Choose a piece first."));
+    return;
+  }
+
+  if (selectedLaunchMode !== mode) {
     setModeLauncherStatus(t("wrongModeHint", "Use the matching numbered mode."));
     return;
   }
 
   selectedLaunchMode = null;
-  draggedLaunchMode = null;
 
   if (mode === "normal") startNormalMode();
   if (mode === "online") startOnlineMode();
   if (mode === "entertainment") startEntertainmentMode();
   if (mode === "training") startTrainingMode();
-}
-
-function handleModeDragStart(event) {
-  const piece = event.currentTarget;
-  draggedLaunchMode = piece.dataset.mode;
-  event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData("text/plain", draggedLaunchMode);
-  piece.classList.add("dragging");
-  document.querySelectorAll(".mode-dropzone").forEach((zone) => {
-    zone.classList.toggle("drop-ready", zone.dataset.mode === draggedLaunchMode);
-  });
-}
-
-function handleModeDragOver(event, mode) {
-  if (draggedLaunchMode !== mode) return;
-  event.preventDefault();
-  event.dataTransfer.dropEffect = "move";
-  event.currentTarget.classList.add("drop-active");
-}
-
-function handleModeDragLeave(event) {
-  event.currentTarget.classList.remove("drop-active");
-}
-
-function handleModeDrop(event, mode) {
-  event.preventDefault();
-  const draggedMode = event.dataTransfer.getData("text/plain") || draggedLaunchMode;
-  event.currentTarget.classList.remove("drop-active");
-
-  if (draggedMode !== mode) {
-    setModeLauncherStatus(t("wrongModeHint", "Use the matching numbered mode."));
-    return;
-  }
-
-  launchGameMode(mode);
-}
-
-function handleModeDragEnd(event) {
-  event.currentTarget.classList.remove("dragging");
-  document.querySelectorAll(".mode-dropzone").forEach((zone) => {
-    zone.classList.remove("drop-ready", "drop-active");
-  });
-  draggedLaunchMode = null;
 }
 
 // ======================================================
@@ -1291,6 +1393,10 @@ function updateTurnDisplay() {
 
 function switchTurn() {
   currentTurn = currentTurn === "white" ? "black" : "white";
+  if (localClock && !onlineMode && !trainingMode) {
+    localClockLastTick = Date.now();
+    updateClockDisplays();
+  }
 }
 // ======================================================
 // TRAINING MODE：選擇棋子
@@ -1710,6 +1816,8 @@ function finishTurn() {
   createBoard();
 
   checkGameState();
+
+  if (gameOver) stopLocalClock();
 
   triggerEntertainmentReaction();
   lastMoveWasCapture = false;
@@ -3012,6 +3120,7 @@ function resetGame() {
   updatePlayerColorUI();
   updateAIDifficultyUI();
   updateTurnDisplay();
+  resetLocalClock();
 
   if (AI_ENABLED && currentTurn === AI_COLOR) {
     startAITurn();
@@ -3774,6 +3883,8 @@ function makeAIMove(move) {
 
     checkGameState();
 
+    if (gameOver) stopLocalClock();
+
     triggerEntertainmentReaction();
     lastMoveWasCapture = false;
     lastMoveWasPromotion = false;
@@ -3796,6 +3907,9 @@ updatePlayerColorUI();
 updateAIDifficultyUI();
 applyBoardTheme();
 applyLanguage();
+updateTimeControlUI("local", localTimeControl);
+updateTimeControlUI("online", onlineTimeControl);
+updateClockDisplays();
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeSettings();
@@ -3912,6 +4026,7 @@ function showMainMenu() {
   // 停止 AI 狀態
   aiThinking = false;
   isAnimating = false;
+  stopLocalClock();
   selectedSquare = null;
   selectedSetupPiece = null;
 
@@ -3997,6 +4112,7 @@ function startTrainingMode() {
   }
 
   entertainmentMode = false;
+  stopLocalClock();
   updateEntertainmentModeUI();
 
   mainMenu.classList.add("hidden");
@@ -4265,6 +4381,12 @@ function connectOnlineSocket() {
     onlineGameStarted = true;
     moveHistory = [];
 
+    if (data?.timeControl) {
+      onlineTimeControl = { preset: data.timeControl.preset, minutes: data.timeControl.minutes };
+      updateTimeControlUI("online", onlineTimeControl);
+    }
+    applyOnlineClock(data?.clock);
+
     if (data && data.fen) {
       pieces = fenToPieces(data.fen);
 
@@ -4292,6 +4414,9 @@ function connectOnlineSocket() {
     AI_COLOR = null;
     onlineGameStarted = true;
 
+    if (data?.timeControl) onlineTimeControl = { preset: data.timeControl.preset, minutes: data.timeControl.minutes };
+    applyOnlineClock(data?.clock);
+
     if (data && data.roomId) {
       onlineRoomId = data.roomId;
     }
@@ -4308,6 +4433,8 @@ function connectOnlineSocket() {
       console.error("moveMade 沒有 FEN");
       return;
     }
+
+    applyOnlineClock(data.clock);
 
     // ==========================================
     // Server 是 Online Mode 唯一真實棋盤
@@ -4363,11 +4490,8 @@ function connectOnlineSocket() {
 
     createBoard();
 
-    // ==========================================
-    // 檢查遊戲狀態
-    // ==========================================
-
-    checkGameState();
+    // 線上棋局的結束由伺服器判定，避免前端局部歷史造成不同步。
+    updateTurnDisplay();
 
     console.log("Online 棋盤同步完成：", data.fen);
   });
@@ -4375,6 +4499,8 @@ function connectOnlineSocket() {
   socket.on("gameOver", (data) => {
     gameOver = true;
     onlineGameStarted = false;
+
+    applyOnlineClock(data?.clock);
 
     setOnlineStatus(data && data.message ? data.message : "棋局結束");
 
@@ -4417,7 +4543,7 @@ function createOnlineRoom() {
 
   setOnlineStatus("正在建立房間……");
 
-  currentSocket.emit("createRoom", (result) => {
+  currentSocket.emit("createRoom", { timeControl: getTimeControlPayload(onlineTimeControl) }, (result) => {
     if (!result || !result.success) {
       setOnlineStatus(
         result && result.message ? result.message : "建立房間失敗",
@@ -4428,6 +4554,8 @@ function createOnlineRoom() {
     onlineRoomId = result.roomId;
     onlineColor = normalizeOnlineColor(result.color || "white");
     onlineGameStarted = false;
+    if (result.timeControl) onlineTimeControl = { preset: result.timeControl.preset, minutes: result.timeControl.minutes };
+    applyOnlineClock(result.clock);
     moveHistory = [];
     updateMoveHistoryDisplay();
 
@@ -4472,6 +4600,8 @@ function joinOnlineRoom() {
     onlineRoomId = result.roomId || roomId;
     onlineColor = normalizeOnlineColor(result.color || "black");
     onlineGameStarted = true;
+    if (result.timeControl) onlineTimeControl = { preset: result.timeControl.preset, minutes: result.timeControl.minutes };
+    applyOnlineClock(result.clock);
     moveHistory = [];
     updateMoveHistoryDisplay();
 

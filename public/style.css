@@ -2186,3 +2186,173 @@ footer {
   #game { width: min(680px, calc(100% - 28px)); grid-template-columns: 1fr; }
   #board-area { width: 100%; }
 }
+
+/* Final compact launcher: modes, pieces, and board are deliberately separate. */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mode-launcher {
+  grid-template-rows: auto 1fr;
+  min-height: calc(100vh - 140px);
+  padding: clamp(30px, 4vw, 58px) 24px 28px;
+  align-content: start;
+}
+
+.mode-launcher-heading { padding: 0; text-align: center; }
+.mode-launcher h2 {
+  font-size: clamp(74px, 10vw, 156px);
+  letter-spacing: -0.09em;
+  line-height: 0.72;
+}
+
+.mode-launcher-stage {
+  display: grid;
+  width: min(100%, 650px);
+  margin: clamp(40px, 6vh, 72px) auto 0;
+  gap: 19px;
+  justify-items: center;
+}
+
+.mode-choice-grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.mode-choice {
+  min-height: 45px;
+  padding: 8px 6px;
+  border: 1px solid #fff;
+  border-radius: 0;
+  background: #000;
+  color: #fff;
+  font-size: clamp(9px, 1.1vw, 12px);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  transition: background 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.mode-choice:hover,
+.mode-choice.selected-target {
+  background: #fff;
+  color: #000;
+  transform: translateY(-2px);
+}
+
+.mode-piece-dock {
+  position: static;
+  display: grid;
+  width: min(100%, 420px);
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: none;
+  gap: 12px;
+  margin: 0;
+  pointer-events: auto;
+}
+
+.mode-drag-piece,
+.mode-drag-piece:nth-child(n) {
+  grid-column: auto;
+  grid-row: auto;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 0.84;
+  padding: 7px;
+  border: 0;
+  outline: 1px solid transparent;
+  outline-offset: 3px;
+  background: #fff;
+  color: #000;
+  cursor: pointer;
+  box-shadow: none;
+  transform: none;
+}
+
+.mode-drag-piece-light { background: #000; color: #fff; }
+.mode-drag-piece img { width: 60%; height: 72%; }
+.mode-drag-piece:hover { transform: translateY(-3px); box-shadow: none; outline-color: currentColor; }
+.mode-drag-piece.selected { transform: translateY(-13px); outline: 2px solid currentColor; box-shadow: 0 10px 0 currentColor; }
+
+.mode-board {
+  width: min(230px, 35vw);
+  aspect-ratio: 1;
+  margin-top: 2px;
+  background-color: #fff;
+  background-image: conic-gradient(#000 25%, #fff 0 50%, #000 0 75%, #fff 0);
+  background-size: 25% 25%;
+  border: 1px solid #fff;
+  pointer-events: none;
+}
+
+@media (max-width: 520px) {
+  .mode-launcher { min-height: calc(100vh - 118px); padding: 30px 18px 22px; }
+  .mode-launcher h2 { font-size: clamp(70px, 22vw, 112px); }
+  .mode-launcher-stage { margin-top: 42px; gap: 15px; }
+  .mode-choice-grid { gap: 4px; }
+  .mode-choice { min-height: 43px; font-size: 8px; letter-spacing: 0.01em; }
+  .mode-piece-dock { width: min(100%, 330px); gap: 8px; }
+  .mode-board { width: min(190px, 52vw); }
+}
+
+/* Chess clocks */
+.time-preset-controls {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.time-preset-controls button {
+  min-height: 35px;
+  padding: 7px 6px;
+  font-size: 8px;
+  letter-spacing: 0.05em;
+}
+
+.time-preset-controls button.active,
+.time-preset-controls button.active:hover {
+  border-color: #fff;
+  background: #fff;
+  color: #000;
+}
+
+.custom-time-wrap {
+  display: grid;
+  grid-template-columns: 1fr 70px;
+  gap: 8px;
+  align-items: center;
+  margin-top: 9px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.custom-time-wrap input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: #000;
+  color: #fff;
+  font: inherit;
+}
+
+.clock-panel { padding: 14px 17px; }
+.chess-clock { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.clock-side { display: grid; gap: 4px; padding: 9px; border: 1px solid rgba(255, 255, 255, 0.17); transition: background 120ms ease, color 120ms ease; }
+.clock-side span { color: rgba(255, 255, 255, 0.5); font-size: 8px; font-weight: 700; letter-spacing: 0.13em; }
+.clock-side strong { font-size: 20px; letter-spacing: 0.05em; font-variant-numeric: tabular-nums; }
+.clock-side.active { border-color: #fff; background: #fff; color: #000; }
+.clock-side.active span { color: rgba(0, 0, 0, 0.55); }
+
+.online-sub-panel .time-preset-controls { margin-bottom: 5px; }
+.online-sub-panel .custom-time-wrap { margin-bottom: 6px; }

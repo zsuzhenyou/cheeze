@@ -34,7 +34,7 @@
           <button type="button" class="board-theme-option" data-board-theme="classic" onclick="setBoardTheme('classic')" role="radio">
             <span class="board-preview board-preview-classic" aria-hidden="true"></span>
             <span data-i18n="boardClassic">CLASSIC</span>
-          </button>
+          </div>
           <button type="button" class="board-theme-option" data-board-theme="ocean" onclick="setBoardTheme('ocean')" role="radio">
             <span class="board-preview board-preview-ocean" aria-hidden="true"></span>
             <span data-i18n="boardOcean">OCEAN</span>
@@ -63,41 +63,26 @@
     <main id="main-menu">
       <section class="mode-launcher" aria-labelledby="mode-launcher-title">
         <div class="mode-launcher-heading">
-          <p class="mode-launcher-index">01 — 04</p>
           <h2 id="mode-launcher-title">CHESS</h2>
-          <p class="mode-launcher-instruction" data-i18n="dragModeHint">DRAG A MATCHING PIECE INTO A MODE</p>
         </div>
 
-        <div class="mode-drop-grid" aria-label="Game modes">
-          <button type="button" class="mode-dropzone" data-mode="normal" onclick="launchGameMode('normal')" ondragover="handleModeDragOver(event, 'normal')" ondragleave="handleModeDragLeave(event)" ondrop="handleModeDrop(event, 'normal')">
-            <span class="mode-slot-number">01</span>
-            <span class="mode-slot-name" data-i18n="singleMode">SINGLE</span>
-            <span class="mode-slot-action" data-i18n="dropModeHint">DROP TO PLAY</span>
-          </button>
-          <button type="button" class="mode-dropzone" data-mode="online" onclick="launchGameMode('online')" ondragover="handleModeDragOver(event, 'online')" ondragleave="handleModeDragLeave(event)" ondrop="handleModeDrop(event, 'online')">
-            <span class="mode-slot-number">02</span>
-            <span class="mode-slot-name" data-i18n="versusMode">VERSUS</span>
-            <span class="mode-slot-action" data-i18n="dropModeHint">DROP TO PLAY</span>
-          </button>
-          <button type="button" class="mode-dropzone" data-mode="entertainment" onclick="launchGameMode('entertainment')" ondragover="handleModeDragOver(event, 'entertainment')" ondragleave="handleModeDragLeave(event)" ondrop="handleModeDrop(event, 'entertainment')">
-            <span class="mode-slot-number">03</span>
-            <span class="mode-slot-name" data-i18n="entertainmentMode">ENTERTAINMENT</span>
-            <span class="mode-slot-action" data-i18n="dropModeHint">DROP TO PLAY</span>
-          </button>
-          <button type="button" class="mode-dropzone" data-mode="training" onclick="launchGameMode('training')" ondragover="handleModeDragOver(event, 'training')" ondragleave="handleModeDragLeave(event)" ondrop="handleModeDrop(event, 'training')">
-            <span class="mode-slot-number">04</span>
-            <span class="mode-slot-name" data-i18n="customMode">CUSTOM</span>
-            <span class="mode-slot-action" data-i18n="dropModeHint">DROP TO PLAY</span>
-          </button>
-
-          <div class="mode-piece-dock" aria-label="Draggable game mode pieces">
-            <button type="button" class="mode-drag-piece" draggable="true" data-mode="normal" aria-label="01 Single" onclick="selectLaunchPiece('normal')" ondragstart="handleModeDragStart(event)" ondragend="handleModeDragEnd(event)"><span>01</span><img src="assets/pieces/classic/black-pawn.png" draggable="false" alt="" /></button>
-            <button type="button" class="mode-drag-piece mode-drag-piece-light" draggable="true" data-mode="online" aria-label="02 Versus" onclick="selectLaunchPiece('online')" ondragstart="handleModeDragStart(event)" ondragend="handleModeDragEnd(event)"><span>02</span><img src="assets/pieces/classic/white-pawn.png" draggable="false" alt="" /></button>
-            <button type="button" class="mode-drag-piece" draggable="true" data-mode="entertainment" aria-label="03 Entertainment" onclick="selectLaunchPiece('entertainment')" ondragstart="handleModeDragStart(event)" ondragend="handleModeDragEnd(event)"><span>03</span><img src="assets/pieces/classic/black-pawn.png" draggable="false" alt="" /></button>
-            <button type="button" class="mode-drag-piece mode-drag-piece-light" draggable="true" data-mode="training" aria-label="04 Custom" onclick="selectLaunchPiece('training')" ondragstart="handleModeDragStart(event)" ondragend="handleModeDragEnd(event)"><span>04</span><img src="assets/pieces/classic/white-pawn.png" draggable="false" alt="" /></button>
+        <div class="mode-launcher-stage">
+          <div class="mode-choice-grid" aria-label="Game modes">
+            <button type="button" class="mode-choice" data-mode="normal" onclick="launchGameMode('normal')"><span data-i18n="singleMode">SINGLE</span></button>
+            <button type="button" class="mode-choice" data-mode="online" onclick="launchGameMode('online')"><span data-i18n="versusMode">VERSUS</span></button>
+            <button type="button" class="mode-choice" data-mode="entertainment" onclick="launchGameMode('entertainment')"><span data-i18n="entertainmentMode">ENTERTAINMENT</span></button>
+            <button type="button" class="mode-choice" data-mode="training" onclick="launchGameMode('training')"><span data-i18n="customMode">CUSTOM</span></button>
           </div>
+
+          <div class="mode-piece-dock" aria-label="Mode pieces">
+            <button type="button" class="mode-drag-piece" data-mode="normal" aria-label="Single" onclick="selectLaunchPiece('normal')"><img src="assets/pieces/classic/black-pawn.png" alt="" /></button>
+            <button type="button" class="mode-drag-piece mode-drag-piece-light" data-mode="online" aria-label="Versus" onclick="selectLaunchPiece('online')"><img src="assets/pieces/classic/white-pawn.png" alt="" /></button>
+            <button type="button" class="mode-drag-piece" data-mode="entertainment" aria-label="Entertainment" onclick="selectLaunchPiece('entertainment')"><img src="assets/pieces/classic/black-pawn.png" alt="" /></button>
+            <button type="button" class="mode-drag-piece mode-drag-piece-light" data-mode="training" aria-label="Custom" onclick="selectLaunchPiece('training')"><img src="assets/pieces/classic/white-pawn.png" alt="" /></button>
+          </div>
+          <div class="mode-board" aria-hidden="true"></div>
         </div>
-        <p id="mode-launcher-status" class="mode-launcher-status" aria-live="polite"></p>
+        <p id="mode-launcher-status" class="visually-hidden" aria-live="polite"></p>
       </section>
     </main>
 
@@ -166,6 +151,23 @@
               <button type="button" data-difficulty="hard" onclick="setAIDifficulty('hard')" data-i18n="hard">HARD</button>
             </div>
           </section>
+
+          <section class="panel time-control-panel">
+            <div class="panel-header"><span data-i18n="timeControl">TIME CONTROL</span></div>
+            <div id="local-time-controls" class="time-preset-controls" role="group" aria-label="Time control">
+              <button type="button" data-time-preset="unlimited" onclick="setLocalTimeControl('unlimited')" data-i18n="unlimited">UNLIMITED</button>
+              <button type="button" data-time-preset="bullet" onclick="setLocalTimeControl('bullet')" data-i18n="bullet">BULLET · 1 MIN</button>
+              <button type="button" data-time-preset="rapid" onclick="setLocalTimeControl('rapid')" data-i18n="rapid">RAPID · 5 MIN</button>
+              <button type="button" data-time-preset="slow" onclick="setLocalTimeControl('slow')" data-i18n="slow">SLOW · 15 MIN</button>
+              <button type="button" data-time-preset="custom" onclick="setLocalTimeControl('custom')" data-i18n="custom">CUSTOM</button>
+            </div>
+            <label id="local-custom-time-wrap" class="custom-time-wrap hidden"><span data-i18n="minutesPerSide">MINUTES PER SIDE</span><input id="local-custom-minutes" type="number" min="1" max="120" value="10" onchange="setLocalCustomMinutes(this.value)" /></label>
+          </section>
+
+          <section id="local-clock-panel" class="panel clock-panel">
+            <div class="panel-header"><span data-i18n="chessClock">CHESS CLOCK</span></div>
+            <div class="chess-clock"><div id="local-clock-white" class="clock-side"><span data-i18n="white">WHITE</span><strong>∞</strong></div><div id="local-clock-black" class="clock-side"><span data-i18n="black">BLACK</span><strong>∞</strong></div></div>
+          </section>
           </div>
 
           <section class="panel record-panel">
@@ -226,6 +228,16 @@
 
             <p class="online-description">建立房間後，將房間 ID 分享給對手。</p>
 
+            <div class="online-label" data-i18n="timeControl">TIME CONTROL</div>
+            <div id="online-time-controls" class="time-preset-controls" role="group" aria-label="Online time control">
+              <button type="button" data-time-preset="unlimited" onclick="setOnlineTimeControl('unlimited')" data-i18n="unlimited">UNLIMITED</button>
+              <button type="button" data-time-preset="bullet" onclick="setOnlineTimeControl('bullet')" data-i18n="bullet">BULLET · 1 MIN</button>
+              <button type="button" data-time-preset="rapid" onclick="setOnlineTimeControl('rapid')" data-i18n="rapid">RAPID · 5 MIN</button>
+              <button type="button" data-time-preset="slow" onclick="setOnlineTimeControl('slow')" data-i18n="slow">SLOW · 15 MIN</button>
+              <button type="button" data-time-preset="custom" onclick="setOnlineTimeControl('custom')" data-i18n="custom">CUSTOM</button>
+            </div>
+            <label id="online-custom-time-wrap" class="custom-time-wrap hidden"><span data-i18n="minutesPerSide">MINUTES PER SIDE</span><input id="online-custom-minutes" type="number" min="1" max="120" value="10" onchange="setOnlineCustomMinutes(this.value)" /></label>
+
             <button
               id="create-room-btn"
               type="button"
@@ -274,6 +286,11 @@
             </div>
 
             <div id="online-status" role="status">尚未連線</div>
+
+            <div id="online-clock-panel" class="clock-panel">
+              <div class="panel-header"><span data-i18n="chessClock">CHESS CLOCK</span></div>
+              <div class="chess-clock"><div id="online-clock-white" class="clock-side"><span data-i18n="white">WHITE</span><strong>∞</strong></div><div id="online-clock-black" class="clock-side"><span data-i18n="black">BLACK</span><strong>∞</strong></div></div>
+            </div>
 
             <div class="online-record">
               <div class="panel-header"><span data-i18n="gameRecord">GAME RECORD</span></div>
