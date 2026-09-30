@@ -1794,6 +1794,7 @@ footer {
 
 .square-reaction[data-event="capture"] .square-reaction-clip,
 .square-reaction[data-event="threat"] .square-reaction-clip,
+.square-reaction[data-event="under-threat"] .square-reaction-clip,
 .square-reaction[data-event="check"] .square-reaction-clip,
 .square-reaction[data-event="result"] .square-reaction-clip {
   background:
@@ -1848,8 +1849,20 @@ footer {
 
 .square-reaction[data-event="check"] .square-reaction-label,
 .square-reaction[data-event="threat"] .square-reaction-label,
+.square-reaction[data-event="under-threat"] .square-reaction-label,
 .square-reaction[data-event="result"] .square-reaction-label {
   background: #e85d5d;
+  color: #fff;
+}
+
+.square-reaction[data-event="threatening"] .square-reaction-clip {
+  background:
+    radial-gradient(circle at 50% 30%, rgba(185, 218, 255, 0.34), transparent 42%),
+    linear-gradient(135deg, #173a64, #091420);
+}
+
+.square-reaction[data-event="threatening"] .square-reaction-label {
+  background: #418ad4;
   color: #fff;
 }
 

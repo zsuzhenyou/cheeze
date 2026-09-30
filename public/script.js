@@ -104,7 +104,8 @@ const TRANSLATIONS = {
     minutesPerSide: "每方分鐘數",
     timeOut: "時間到",
     startGame: "開始對局",
-    threat: "威脅！",
+    threatening: "威脅他人！",
+    underThreat: "受到威脅！",
     niceMove: "漂亮的一步",
     capture: "吃子！",
     check: "將軍！",
@@ -320,7 +321,7 @@ function playEntertainmentSound(type) {
     const context = new AudioContextClass();
     const oscillator = context.createOscillator();
     const gain = context.createGain();
-    const frequencies = { move: 360, threat: 520, capture: 160, check: 620, promotion: 780, result: 220 };
+    const frequencies = { move: 360, threat: 520, threatening: 560, "under-threat": 460, capture: 160, check: 620, promotion: 780, result: 220 };
     oscillator.frequency.value = frequencies[type] || 360;
     oscillator.type = type === "capture" ? "square" : "sine";
     gain.gain.setValueAtTime(0.045, context.currentTime);
@@ -334,7 +335,7 @@ function playEntertainmentSound(type) {
   }
 }
 
-function showSquareReaction(row, col, type, emoji, label, delay = 0) {
+function showSquareReaction(row, col, type, emoji, label, delay = 0, duration = 1900) {
   const visual = getVisualPosition(row, col);
   const square = board.children[visual.row * 8 + visual.col];
   if (!square) return;
@@ -360,7 +361,7 @@ function showSquareReaction(row, col, type, emoji, label, delay = 0) {
     clip.append(emojiElement, scanline, labelElement);
     reaction.appendChild(clip);
     square.appendChild(reaction);
-    window.setTimeout(() => reaction.remove(), 1900);
+    window.setTimeout(() => reaction.remove(), duration);
   }, delay);
 }
 
@@ -393,24 +394,36 @@ function triggerEntertainmentReaction() {
   // 沒有新威脅時完全不播放，避免每一步都干擾對局。
   if (threatenedPieces.length === 0) return;
 
-  const type = "threat";
-  const reactions = ["😈", "👀", "⚠️", "😮"];
-  const label = t("threat", "THREAT!");
-  const emoji = reactions[Math.floor(Math.random() * reactions.length)];
+  const attackerDuration = 900;
+  const attackerReactions = ["😈", "🫵", "⚔️"];
+  const threatenedReactions = ["😱", "⚠️", "👀"];
+  const attackerEmoji = attackerReactions[Math.floor(Math.random() * attackerReactions.length)];
+  const threatenedEmoji = threatenedReactions[Math.floor(Math.random() * threatenedReactions.length)];
 
-  // 移動方只在「落子終點」出現；所有被它直接攻擊到的敵子各自在原格出現。
-  const targets = [
-    { row: lastMove.toRow, col: lastMove.toCol },
-    ...threatenedPieces,
-  ];
-  const uniqueTargets = targets.filter(
-    (target, index) =>
-      targets.findIndex((candidate) => candidate.row === target.row && candidate.col === target.col) === index,
+  // 第一段只屬於剛移動的攻擊方；第二段才讓所有受它威脅的敵子同步出現。
+  showSquareReaction(
+    lastMove.toRow,
+    lastMove.toCol,
+    "threatening",
+    attackerEmoji,
+    t("threatening", "THREATENS!"),
+    0,
+    attackerDuration,
   );
-  uniqueTargets.forEach((target, index) =>
-    showSquareReaction(target.row, target.col, type, emoji, label, index * 110),
-  );
-  playEntertainmentSound(type);
+  playEntertainmentSound("threatening");
+
+  window.setTimeout(() => {
+    threatenedPieces.forEach((target) => {
+      showSquareReaction(
+        target.row,
+        target.col,
+        "under-threat",
+        threatenedEmoji,
+        t("underThreat", "UNDER THREAT!"),
+      );
+    });
+    playEntertainmentSound("under-threat");
+  }, attackerDuration);
 }
 
 function applyLanguage() {
