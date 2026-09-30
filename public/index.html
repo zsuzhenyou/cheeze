@@ -61,7 +61,7 @@
     </div>
 
     <main id="main-menu">
-      <section class="mode-launcher" aria-labelledby="mode-launcher-title">
+      <section id="mode-launcher" class="mode-launcher" aria-labelledby="mode-launcher-title">
         <div class="mode-launcher-heading">
           <h2 id="mode-launcher-title">CHESS</h2>
         </div>
@@ -84,11 +84,26 @@
         </div>
         <p id="mode-launcher-status" class="visually-hidden" aria-live="polite"></p>
       </section>
+
+      <section id="local-game-setup" class="local-game-setup hidden" aria-labelledby="local-setup-title">
+        <div class="setup-heading"><button type="button" class="setup-back" onclick="returnToModeLauncher()" data-i18n="back">BACK</button><p id="local-setup-eyebrow" data-i18n="singleMode">SINGLE</p><h2 id="local-setup-title" data-i18n="normalMode">NORMAL MODE</h2></div>
+        <div class="setup-options">
+          <section class="setup-option"><div class="panel-header"><span data-i18n="playAs">PLAY AS</span></div><div id="controls"><button type="button" data-color="white" onclick="setPlayerColor('white')" data-i18n="white">WHITE</button><button type="button" data-color="black" onclick="setPlayerColor('black')" data-i18n="black">BLACK</button></div></section>
+          <section class="setup-option"><div class="panel-header"><span data-i18n="aiDifficulty">AI DIFFICULTY</span></div><div id="difficulty-controls" role="group" aria-label="AI difficulty"><button type="button" data-difficulty="beginner" onclick="setAIDifficulty('beginner')" data-i18n="beginner">BEGINNER</button><button type="button" data-difficulty="easy" onclick="setAIDifficulty('easy')" data-i18n="easy">EASY</button><button type="button" data-difficulty="normal" onclick="setAIDifficulty('normal')" data-i18n="normal">NORMAL</button><button type="button" data-difficulty="hard" onclick="setAIDifficulty('hard')" data-i18n="hard">HARD</button></div></section>
+          <section class="setup-option setup-time-option"><div class="panel-header"><span data-i18n="timeControl">TIME CONTROL</span></div><div id="local-time-controls" class="time-preset-controls" role="group" aria-label="Time control"><button type="button" data-time-preset="unlimited" onclick="setLocalTimeControl('unlimited')" data-i18n="unlimited">UNLIMITED</button><button type="button" data-time-preset="bullet" onclick="setLocalTimeControl('bullet')" data-i18n="bullet">BULLET · 1 MIN</button><button type="button" data-time-preset="rapid" onclick="setLocalTimeControl('rapid')" data-i18n="rapid">RAPID · 5 MIN</button><button type="button" data-time-preset="slow" onclick="setLocalTimeControl('slow')" data-i18n="slow">SLOW · 15 MIN</button><button type="button" data-time-preset="custom" onclick="setLocalTimeControl('custom')" data-i18n="custom">CUSTOM</button></div><label id="local-custom-time-wrap" class="custom-time-wrap hidden"><span data-i18n="minutesPerSide">MINUTES PER SIDE</span><input id="local-custom-minutes" type="number" min="1" max="120" value="10" onchange="setLocalCustomMinutes(this.value)" /></label></section>
+        </div>
+        <button type="button" class="setup-start" onclick="startConfiguredLocalGame()" data-i18n="startGame">START GAME</button>
+      </section>
     </main>
 
     <main id="game" class="hidden">
       <section id="board-area">
         <div id="chessboard"></div>
+        <div id="board-info-strip">
+          <div class="board-material"><span data-i18n="material">MATERIAL</span><strong id="material-score">0</strong></div>
+          <section id="local-clock-panel" class="board-clock clock-panel"><div class="chess-clock"><div id="local-clock-white" class="clock-side"><span data-i18n="white">WHITE</span><strong>∞</strong></div><div id="local-clock-black" class="clock-side"><span data-i18n="black">BLACK</span><strong>∞</strong></div></div></section>
+          <section id="online-clock-panel" class="board-clock clock-panel hidden"><div class="chess-clock"><div id="online-clock-white" class="clock-side"><span data-i18n="white">WHITE</span><strong>∞</strong></div><div id="online-clock-black" class="clock-side"><span data-i18n="black">BLACK</span><strong>∞</strong></div></div></section>
+        </div>
       </section>
 
       <aside id="side-panel">
@@ -111,63 +126,12 @@
             </div>
 
             <div id="turn">White's Turn</div>
-            <div id="material-score"></div>
             <div class="match-summary" aria-label="Match information">
               <div><span data-i18n="you">YOU</span><strong id="single-player-summary">WHITE</strong></div>
               <div><span data-i18n="opponent">OPPONENT</span><strong id="single-opponent-summary">AI · NORMAL</strong></div>
             </div>
           </section>
 
-          <section class="panel player-panel">
-            <div class="panel-header">
-              <span data-i18n="playAs">PLAY AS</span>
-            </div>
-
-            <div id="controls">
-              <button
-                type="button"
-                data-color="white"
-                onclick="setPlayerColor('white')"
-              >
-                <span data-i18n="white">WHITE</span>
-              </button>
-
-              <button
-                type="button"
-                data-color="black"
-                onclick="setPlayerColor('black')"
-              >
-                <span data-i18n="black">BLACK</span>
-              </button>
-            </div>
-          </section>
-
-          <section class="panel difficulty-panel">
-            <div class="panel-header"><span data-i18n="aiDifficulty">AI DIFFICULTY</span></div>
-            <div id="difficulty-controls" role="group" aria-label="AI difficulty">
-              <button type="button" data-difficulty="beginner" onclick="setAIDifficulty('beginner')" data-i18n="beginner">BEGINNER</button>
-              <button type="button" data-difficulty="easy" onclick="setAIDifficulty('easy')" data-i18n="easy">EASY</button>
-              <button type="button" data-difficulty="normal" onclick="setAIDifficulty('normal')" data-i18n="normal">NORMAL</button>
-              <button type="button" data-difficulty="hard" onclick="setAIDifficulty('hard')" data-i18n="hard">HARD</button>
-            </div>
-          </section>
-
-          <section class="panel time-control-panel">
-            <div class="panel-header"><span data-i18n="timeControl">TIME CONTROL</span></div>
-            <div id="local-time-controls" class="time-preset-controls" role="group" aria-label="Time control">
-              <button type="button" data-time-preset="unlimited" onclick="setLocalTimeControl('unlimited')" data-i18n="unlimited">UNLIMITED</button>
-              <button type="button" data-time-preset="bullet" onclick="setLocalTimeControl('bullet')" data-i18n="bullet">BULLET · 1 MIN</button>
-              <button type="button" data-time-preset="rapid" onclick="setLocalTimeControl('rapid')" data-i18n="rapid">RAPID · 5 MIN</button>
-              <button type="button" data-time-preset="slow" onclick="setLocalTimeControl('slow')" data-i18n="slow">SLOW · 15 MIN</button>
-              <button type="button" data-time-preset="custom" onclick="setLocalTimeControl('custom')" data-i18n="custom">CUSTOM</button>
-            </div>
-            <label id="local-custom-time-wrap" class="custom-time-wrap hidden"><span data-i18n="minutesPerSide">MINUTES PER SIDE</span><input id="local-custom-minutes" type="number" min="1" max="120" value="10" onchange="setLocalCustomMinutes(this.value)" /></label>
-          </section>
-
-          <section id="local-clock-panel" class="panel clock-panel">
-            <div class="panel-header"><span data-i18n="chessClock">CHESS CLOCK</span></div>
-            <div class="chess-clock"><div id="local-clock-white" class="clock-side"><span data-i18n="white">WHITE</span><strong>∞</strong></div><div id="local-clock-black" class="clock-side"><span data-i18n="black">BLACK</span><strong>∞</strong></div></div>
-          </section>
           </div>
 
           <section class="panel record-panel">
@@ -286,11 +250,6 @@
             </div>
 
             <div id="online-status" role="status">尚未連線</div>
-
-            <div id="online-clock-panel" class="clock-panel">
-              <div class="panel-header"><span data-i18n="chessClock">CHESS CLOCK</span></div>
-              <div class="chess-clock"><div id="online-clock-white" class="clock-side"><span data-i18n="white">WHITE</span><strong>∞</strong></div><div id="online-clock-black" class="clock-side"><span data-i18n="black">BLACK</span><strong>∞</strong></div></div>
-            </div>
 
             <div class="online-record">
               <div class="panel-header"><span data-i18n="gameRecord">GAME RECORD</span></div>

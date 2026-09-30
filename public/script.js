@@ -103,6 +103,7 @@ const TRANSLATIONS = {
     custom: "自訂",
     minutesPerSide: "每方分鐘數",
     timeOut: "時間到",
+    startGame: "開始對局",
     threat: "威脅！",
     niceMove: "漂亮的一步",
     capture: "吃子！",
@@ -137,6 +138,7 @@ let localClockLastTick = 0;
 let localClockTimer = null;
 let onlineClock = null;
 let onlineClockTimer = null;
+let pendingLocalEntertainmentMode = false;
 
 function timeControlMinutes(control) {
   if (!control || control.preset === "unlimited") return null;
@@ -161,13 +163,13 @@ function updateTimeControlUI(prefix, control) {
 function setLocalTimeControl(preset) {
   localTimeControl = { preset, minutes: preset === "custom" ? Number(document.getElementById("local-custom-minutes")?.value) || 10 : TIME_PRESETS[preset] };
   updateTimeControlUI("local", localTimeControl);
-  if (!onlineMode && !trainingMode) resetGame();
+  if (!onlineMode && !trainingMode && document.getElementById("local-game-setup")?.classList.contains("hidden")) resetGame();
 }
 
 function setLocalCustomMinutes(value) {
   localTimeControl = { preset: "custom", minutes: Math.min(120, Math.max(1, Number(value) || 10)) };
   updateTimeControlUI("local", localTimeControl);
-  if (!onlineMode && !trainingMode) resetGame();
+  if (!onlineMode && !trainingMode && document.getElementById("local-game-setup")?.classList.contains("hidden")) resetGame();
 }
 
 function setOnlineTimeControl(preset) {
@@ -883,7 +885,7 @@ function setPlayerColor(color) {
   updatePlayerColorUI();
   updateSingleMatchSummary();
 
-  resetGame();
+  if (document.getElementById("local-game-setup")?.classList.contains("hidden")) resetGame();
 }
 
 // ======================================================
@@ -962,13 +964,18 @@ function updateMaterialScoreDisplay() {
     return;
   }
 
-  const score = calculateMaterialScore();
-
-  if (score > 0) {
-    materialScoreDisplay.textContent = `${t("material", "MATERIAL")}  +${score}`;
-  } else {
-    materialScoreDisplay.textContent = `${t("material", "MATERIAL")}  ${score}`;
+  let white = 0;
+  let black = 0;
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = pieces[row][col];
+      const value = MATERIAL_VALUES[piece] || 0;
+      if (getPieceColor(piece) === "white") white += value;
+      if (getPieceColor(piece) === "black") black += value;
+    }
   }
+
+  materialScoreDisplay.textContent = `${t("white", "WHITE")} ${white} · ${t("black", "BLACK")} ${black}`;
 }
 
 // ======================================================
@@ -4044,6 +4051,11 @@ function showMainMenu() {
 
   const normalPanel = getElement("normal-panel");
   const trainingPanel = getElement("training-panel");
+  const launcher = getElement("mode-launcher");
+  const setup = getElement("local-game-setup");
+
+  if (launcher) launcher.classList.remove("hidden");
+  if (setup) setup.classList.add("hidden");
 
   if (normalPanel) {
     normalPanel.classList.remove("hidden");
@@ -4052,25 +4064,67 @@ function showMainMenu() {
   if (trainingPanel) {
     trainingPanel.classList.add("hidden");
   }
+  setClockPanelMode("local");
 }
 
 function startNormalMode(isEntertainment = false) {
   const mainMenu = getElement("main-menu");
   const game = getElement("game");
 
-  if (!mainMenu || !game) return;
+  const launcher = getElement("mode-launcher");
+  const setup = getElement("local-game-setup");
+  if (!mainMenu || !game || !launcher || !setup) return;
 
   onlineMode = false;
   onlineGameStarted = false;
   onlineRoomId = null;
   onlineColor = null;
+  stopLocalClock();
+  trainingMode = false;
+  trainingSetup = false;
+  pendingLocalEntertainmentMode = isEntertainment;
+  entertainmentMode = false;
+
+  mainMenu.classList.remove("hidden");
+  game.classList.add("hidden");
+  launcher.classList.add("hidden");
+  setup.classList.remove("hidden");
+
+  const eyebrow = getElement("local-setup-eyebrow");
+  const title = getElement("local-setup-title");
+  if (eyebrow) eyebrow.textContent = isEntertainment ? t("entertainmentMode", "ENTERTAINMENT") : t("singleMode", "SINGLE");
+  if (title) title.textContent = isEntertainment ? t("entertainmentMode", "ENTERTAINMENT MODE") : t("normalMode", "NORMAL MODE");
+
+  updatePlayerColorUI();
+  updateAIDifficultyUI();
+  updateTimeControlUI("local", localTimeControl);
+}
+
+function returnToModeLauncher() {
+  const launcher = getElement("mode-launcher");
+  const setup = getElement("local-game-setup");
+  if (launcher) launcher.classList.remove("hidden");
+  if (setup) setup.classList.add("hidden");
+  pendingLocalEntertainmentMode = false;
+}
+
+function setClockPanelMode(mode) {
+  const localPanel = getElement("local-clock-panel");
+  const onlinePanel = getElement("online-clock-panel");
+  if (localPanel) localPanel.classList.toggle("hidden", mode !== "local");
+  if (onlinePanel) onlinePanel.classList.toggle("hidden", mode !== "online");
+}
+
+function startConfiguredLocalGame() {
+  const mainMenu = getElement("main-menu");
+  const game = getElement("game");
+  const setup = getElement("local-game-setup");
+  if (!mainMenu || !game) return;
 
   mainMenu.classList.add("hidden");
   game.classList.remove("hidden");
-
-  trainingMode = false;
-  trainingSetup = false;
-  entertainmentMode = isEntertainment;
+  if (setup) setup.classList.add("hidden");
+  entertainmentMode = pendingLocalEntertainmentMode;
 
   const normalPanel = getElement("normal-panel");
   const trainingPanel = getElement("training-panel");
@@ -4093,6 +4147,7 @@ function startNormalMode(isEntertainment = false) {
 
   setNormalSidebarTab("play");
   updateEntertainmentModeUI();
+  setClockPanelMode("local");
   resetGame();
 }
 
@@ -4114,6 +4169,7 @@ function startTrainingMode() {
   entertainmentMode = false;
   stopLocalClock();
   updateEntertainmentModeUI();
+  setClockPanelMode("training");
 
   mainMenu.classList.add("hidden");
   game.classList.remove("hidden");
@@ -4135,6 +4191,7 @@ function startOnlineMode() {
   onlineGameStarted = false;
   onlineRoomId = null;
   onlineColor = null;
+  setClockPanelMode("online");
 
   if (mainMenu) {
     mainMenu.classList.add("hidden");
