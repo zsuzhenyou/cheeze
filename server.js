@@ -1,5 +1,7 @@
 const express = require("express");
 const http = require("http");
+const fs = require("fs");
+const path = require("path");
 const { Server } = require("socket.io");
 const { Chess } = require("chess.js");
 
@@ -11,6 +13,23 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static("public"));
 app.get("/health", (_request, response) => {
   response.status(200).send("ok");
+});
+
+app.get("/api/reactions", (_request, response) => {
+  const reactionRoot = path.join(__dirname, "public", "assets", "reactions");
+  const getReactionFiles = (folder) => {
+    try {
+      return fs.readdirSync(path.join(reactionRoot, folder))
+        .filter((fileName) => /\.(gif|mp4)$/i.test(fileName));
+    } catch (_error) {
+      return [];
+    }
+  };
+
+  response.json({
+    threatening: getReactionFiles("threatening"),
+    underThreat: getReactionFiles("under-threat"),
+  });
 });
 
 const rooms = {};

@@ -335,7 +335,33 @@ function playEntertainmentSound(type) {
   }
 }
 
-function showSquareReaction(row, col, type, emoji, label, delay = 0, duration = 1900) {
+let reactionAssets = { threatening: [], underThreat: [] };
+
+async function loadReactionAssets() {
+  try {
+    const response = await fetch("/api/reactions", { cache: "no-store" });
+    if (!response.ok) return;
+
+    const assets = await response.json();
+    reactionAssets = {
+      threatening: Array.isArray(assets.threatening) ? assets.threatening.filter((name) => typeof name === "string") : [],
+      underThreat: Array.isArray(assets.underThreat) ? assets.underThreat.filter((name) => typeof name === "string") : [],
+    };
+  } catch (_error) {
+    // 找不到自訂 GIF 時，保留表情動畫作為備用效果。
+  }
+}
+
+function getReactionAsset(group) {
+  const fileNames = reactionAssets[group] || [];
+  if (fileNames.length === 0) return "";
+
+  const fileName = fileNames[Math.floor(Math.random() * fileNames.length)];
+  const folder = group === "underThreat" ? "under-threat" : "threatening";
+  return `assets/reactions/${folder}/${encodeURIComponent(fileName)}`;
+}
+
+function showSquareReaction(row, col, type, emoji, label, delay = 0, duration = 1900, assetUrl = "", playSound = true) {
   const visual = getVisualPosition(row, col);
   const square = board.children[visual.row * 8 + visual.col];
   if (!square) return;
@@ -351,6 +377,29 @@ function showSquareReaction(row, col, type, emoji, label, delay = 0, duration = 
     emojiElement.className = "square-reaction-emoji";
     emojiElement.textContent = emoji;
 
+    const isVideo = /\.mp4(?:$|\?)/i.test(assetUrl);
+    const reactionMedia = assetUrl ? document.createElement(isVideo ? "video" : "img") : null;
+    if (reactionMedia) {
+      reactionMedia.className = "square-reaction-media";
+      reactionMedia.src = assetUrl;
+      reactionMedia.alt = "";
+      reactionMedia.addEventListener("error", () => reactionMedia.remove(), { once: true });
+
+      if (isVideo) {
+        reactionMedia.autoplay = true;
+        reactionMedia.loop = true;
+        reactionMedia.playsInline = true;
+        reactionMedia.preload = "auto";
+        reactionMedia.muted = !playSound;
+        reactionMedia.volume = playSound ? 0.72 : 0;
+        reactionMedia.play().catch(() => {
+          // 瀏覽器禁止自動播放有聲影片時，仍保留畫面並靜音播放。
+          reactionMedia.muted = true;
+          reactionMedia.play().catch(() => reactionMedia.remove());
+        });
+      }
+    }
+
     const scanline = document.createElement("span");
     scanline.className = "square-reaction-scanline";
 
@@ -358,7 +407,9 @@ function showSquareReaction(row, col, type, emoji, label, delay = 0, duration = 
     labelElement.className = "square-reaction-label";
     labelElement.textContent = label;
 
-    clip.append(emojiElement, scanline, labelElement);
+    clip.append(emojiElement);
+    if (reactionMedia) clip.append(reactionMedia);
+    clip.append(scanline, labelElement);
     reaction.appendChild(clip);
     square.appendChild(reaction);
     window.setTimeout(() => reaction.remove(), duration);
@@ -409,10 +460,13 @@ function triggerEntertainmentReaction() {
     t("threatening", "THREATENS!"),
     0,
     attackerDuration,
+    getReactionAsset("threatening"),
   );
   playEntertainmentSound("threatening");
 
   window.setTimeout(() => {
+    // 同一次威脅的所有受害棋子共用同一支隨機影片，讓畫面與音效保持一致。
+    const threatenedAsset = getReactionAsset("underThreat");
     threatenedPieces.forEach((target) => {
       showSquareReaction(
         target.row,
@@ -420,11 +474,17 @@ function triggerEntertainmentReaction() {
         "under-threat",
         threatenedEmoji,
         t("underThreat", "UNDER THREAT!"),
+        0,
+        1900,
+        threatenedAsset,
+        true,
       );
     });
     playEntertainmentSound("under-threat");
   }, attackerDuration);
 }
+
+loadReactionAssets();
 
 function applyLanguage() {
   document.documentElement.lang = currentLanguage;
